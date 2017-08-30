@@ -1,0 +1,25 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+neoADC	KEYWORD1
+neoPWM	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+init 		KEYWORD2
+setVREF		KEYWORD2
+read		KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+## Voltage reference Modes
+EXT 		LITERAL1
+INT 		LITERAL1
+
+## Channel ending modes
+SD			LITERAL1
+FD			LITERAL1
