@@ -41,8 +41,6 @@ void loop( void ) ;
 } // extern "C"
 #endif
 
-#include “elapsedMillis.h”
-
 // The following headers are for C++ only compilation
 #ifdef __cplusplus
   #include "WCharacter.h"
@@ -66,6 +64,9 @@ void loop( void ) ;
 #include "wiring_analog.h"
 #include "wiring_shift.h"
 #include "WInterrupts.h"
+
+#include "elapsedMillis.h"
+
 
 // undefine stdlib's abs if encountered
 #ifdef abs
