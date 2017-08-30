@@ -3,21 +3,21 @@
     {
       "name": "deftdynamics",
       "maintainer": "Kyle Kubik",
-      "websiteURL": "https://github.com/KyleKubik/neoPLC",
+      "websiteURL": "https://github.com/DeftDynamics/neoPLC-arduino",
       "email": "kylekubik@gmail.com",
       "help": {
-        "online": "https://github.com/KyleKubik/neoPLC/issues"
+        "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
       },
       "platforms": [
         {
-          "name": "Deft Dynamics nRF5 Boards",
-          "architecture": "nRF5",
+          "name": "neoPLC Boards",
+          "architecture": "nRF52",
           "version": "0.0.0",
           "category": "Contributed",
           "help": {
-            "online": "https://github.com/KyleKubik/neoPLC/issues"
+            "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
           },
-          "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/neoPLC-0.0.zip",
+          "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/neoPLC-0.0.zip",
           "archiveFileName": "neoPLC-0.0.zip",
           "checksum": "SHA-256:1d2c03b797edf61760c38df04c69cd47dcb7a59e4d3c5cd57fed69df2b41744a",
           "size": "877771",
@@ -39,14 +39,14 @@
           ]
         },
         {
-          "name": "Deft Dynamics nRF5 Boards",
-          "architecture": "nRF5",
+          "name": "neoPLC Boards",
+          "architecture": "nRF52",
           "version": "0.1.0",
           "category": "Contributed",
           "help": {
-            "online": "https://github.com/KyleKubik/neoPLC/issues"
+            "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
           },
-          "url": "https://github.com/KyleKubik/neoPLC/archive/0.1.tar.gz",
+          "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/0.1.tar.gz",
           "archiveFileName": "neoPLC-0.1.tar.gz",
           "checksum": "MD5:b19f2f1b51a1b253a7d9d8cbc5f75971",
           "size": "707126",
@@ -75,28 +75,28 @@
           "systems": [
             {
               "host": "i386-apple-darwin11",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-mac.tar.bz2",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-mac.tar.bz2",
               "archiveFileName": "gcc-arm-none-eabi-5_2-2015q4-20151219-mac.tar.bz2",
               "size": "96372129",
               "checksum": "MD5:603bcce8e59683ac27054b3197a53254"
             },
             {
               "host": "i686-linux-gnu",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2",
               "archiveFileName": "gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2",
               "size": "92811866",
               "checksum": "MD5:f88caac80b4444a17344f57ccb760b90"
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2",
               "archiveFileName": "gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2",
               "size": "92811866",
               "checksum": "MD5:f88caac80b4444a17344f57ccb760b90"
             },
             {
               "host": "i686-mingw32",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-win32.tar.bz2",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/gcc-arm-none-eabi-5_2-2015q4-20151219-win32.tar.bz2",
               "archiveFileName": "gcc-arm-none-eabi-5_2-2015q4-20151219-win32.tar.bz2",
               "size": "102981732",
               "checksum": "MD5:32d950225b6c7c886f6225c1fc578934"
@@ -109,28 +109,28 @@
           "systems": [
             {
               "host": "i386-apple-darwin11",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/nrfutil-mac.tar.gz",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/nrfutil-mac.tar.gz",
               "archiveFileName": "nrfutil-mac.tar.gz",
               "size": "5877321",
               "checksum": "MD5:449dfda2ba0e83b357116e28d0cb2c8e"
             },
             {
               "host": "i686-linux-gnu",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/nrfutil-mac.tar.gz",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/nrfutil-mac.tar.gz",
               "archiveFileName": "nrfutil-mac.tar.gz",
               "size": "5877321",
               "checksum": "MD5:449dfda2ba0e83b357116e28d0cb2c8e"
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/nrfutil-mac.tar.gz",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/nrfutil-mac.tar.gz",
               "archiveFileName": "nrfutil-mac.tar.gz",
               "size": "5877321",
               "checksum": "MD5:449dfda2ba0e83b357116e28d0cb2c8e"
             },
             {
               "host": "i686-mingw32",
-              "url": "https://github.com/kylekubik/neoPLC/releases/download/0.0/nrfutil-win32.zip",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/nrfutil-win32.zip",
               "archiveFileName": "nrfutil-win32.zip",
               "size": "5453524",
               "checksum": "SHA-256:c961c8704fe4922facacd4d6a6cb58e6ab22b82916ea8a320db06530091d67d0"
