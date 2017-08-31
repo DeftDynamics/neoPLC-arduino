@@ -54,7 +54,7 @@ void TwoWire::begin(void) {
                                 | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1       << GPIO_PIN_CNF_DRIVE_Pos)
                                 | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
 
-  _p_twim->FREQUENCY = TWIM_FREQUENCY_FREQUENCY_K100;
+  _p_twim->FREQUENCY = TWIM_FREQUENCY_FREQUENCY_K400;
   _p_twim->ENABLE = (TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos);
   _p_twim->PSEL.SCL = _uc_pinSCL;
   _p_twim->PSEL.SDA = _uc_pinSDA;

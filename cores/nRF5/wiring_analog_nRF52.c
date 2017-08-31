@@ -42,7 +42,7 @@ static uint32_t pwmChannelPins[PWM_COUNT] = {
   0xFFFFFFFF
 };
 
-static uint32_t saadcReference = SAADC_CH_CONFIG_REFSEL_Internal;
+static uint32_t saadcReference = SAADC_CH_CONFIG_REFSEL_VDD1_4;
 static uint16_t pwmChannelSequence[PWM_COUNT];
 
 static int readResolution = 10;
@@ -169,7 +169,7 @@ uint32_t analogRead( uint32_t ulPin )
   }
   NRF_SAADC->CH[0].CONFIG = ((SAADC_CH_CONFIG_RESP_Bypass   << SAADC_CH_CONFIG_RESP_Pos)   & SAADC_CH_CONFIG_RESP_Msk)
                             | ((SAADC_CH_CONFIG_RESP_Bypass   << SAADC_CH_CONFIG_RESN_Pos)   & SAADC_CH_CONFIG_RESN_Msk)
-                            | ((SAADC_CH_CONFIG_GAIN_Gain1    << SAADC_CH_CONFIG_GAIN_Pos)   & SAADC_CH_CONFIG_GAIN_Msk)
+                            | ((SAADC_CH_CONFIG_GAIN_Gain1_4    << SAADC_CH_CONFIG_GAIN_Pos)   & SAADC_CH_CONFIG_GAIN_Msk)
                             | ((saadcReference                << SAADC_CH_CONFIG_REFSEL_Pos) & SAADC_CH_CONFIG_REFSEL_Msk)
                             | ((SAADC_CH_CONFIG_TACQ_3us      << SAADC_CH_CONFIG_TACQ_Pos)   & SAADC_CH_CONFIG_TACQ_Msk)
                             | ((SAADC_CH_CONFIG_MODE_SE       << SAADC_CH_CONFIG_MODE_Pos)   & SAADC_CH_CONFIG_MODE_Msk);
@@ -219,7 +219,7 @@ void analogWrite( uint32_t ulPin, uint32_t ulValue )
   for (int i = 0; i < PWM_COUNT; i++) {
     if (pwmChannelPins[i] == 0xFFFFFFFF || pwmChannelPins[i] == ulPin) {
       pwmChannelPins[i] = ulPin;
-      pwmChannelSequence[i] = ulValue;
+      pwmChannelSequence[i] = 255-ulValue;
 
       NRF_PWM_Type* pwm = pwms[i];
 
