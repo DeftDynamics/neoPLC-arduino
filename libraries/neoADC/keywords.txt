@@ -2,8 +2,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-neoADC	KEYWORD1
-neoPWM	KEYWORD1
+neoADS	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

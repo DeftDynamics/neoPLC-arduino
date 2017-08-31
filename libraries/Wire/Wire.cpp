@@ -38,7 +38,7 @@ TwoWire::TwoWire(NRF_TWIM_Type * p_twim, NRF_TWIS_Type * p_twis, IRQn_Type IRQn,
 }
 
 void TwoWire::begin(void) {
-	Serial.println("two wire begin");
+	//Serial.println("two wire begin");
   //Master Mode
   master = true;
 
