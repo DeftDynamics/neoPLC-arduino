@@ -23,97 +23,47 @@ menu.version=Version
 menu.lfclk=Low Frequency Clock
 menu.nfcprotect=NFC Protect
 
-#neoPLCv2
+#neoPLCv1
 #################################################################################
-neoPLCv2.name=neoPLC 2.0
+neoPLCv1.name=neoPLC 1.0
 
-neoPLCv2.vid.0=0x10c4
-neoPLCv2.pid.0=0xea60
+neoPLCv1.vid.0=0x10c4
+neoPLCv1.pid.0=0xea60
 
-neoPLCv2.upload.tool=nRFgo
-neoPLCv2.upload.protocol=
-neoPLCv2.upload.interface=jlink
-neoPLCv2.upload.target=nrf52
-neoPLCv2.upload.maximum_size=372000
-neoPLCv2.upload.setup_command=transport select swd;
-neoPLCv2.upload.use_1200bps_touch=false
-neoPLCv2.upload.wait_for_upload_port=false
-neoPLCv2.upload.native_usb=false
+neoPLCv1.upload.tool=nRFgo
+neoPLCv1.upload.protocol=
+neoPLCv1.upload.interface=jlink
+neoPLCv1.upload.target=nrf52
+neoPLCv1.upload.maximum_size=372000
+neoPLCv1.upload.setup_command=transport select swd;
+neoPLCv1.upload.use_1200bps_touch=false
+neoPLCv1.upload.wait_for_upload_port=false
+neoPLCv1.upload.native_usb=false
 
-neoPLCv2.build.mcu=cortex-m4
-neoPLCv2.build.f_cpu=16000000
-neoPLCv2.build.board=NRF52_DK
-neoPLCv2.build.core=nRF5
-neoPLCv2.build.variant=neoPLCv2
+neoPLCv1.build.mcu=cortex-m4
+neoPLCv1.build.f_cpu=16000000
+neoPLCv1.build.board=NRF52_DK
+neoPLCv1.build.core=nRF5
+neoPLCv1.build.variant=neoPLCv1
 neoPLCv2.build.variant_system_lib=
-neoPLCv2.build.extra_flags=-DNRF52
-neoPLCv2.build.float_flags=-mfloat-abi=hard -mfpu=fpv4-sp-d16
-neoPLCv2.build.ldscript=nrf52_xxaa.ld
+neoPLCv1.build.extra_flags=-DNRF52
+neoPLCv1.build.float_flags=-mfloat-abi=hard -mfpu=fpv4-sp-d16
+neoPLCv1.build.ldscript=nrf52_xxaa.ld
 
-neoPLCv2.menu.softdevice.s132=S132
-neoPLCv2.menu.softdevice.s132.softdevice=s132
-neoPLCv2.menu.softdevice.s132.softdeviceversion=2.0.1
-neoPLCv2.menu.softdevice.s132.upload.maximum_size=372000
-neoPLCv2.menu.softdevice.s132.build.extra_flags=-DNRF52 -DS132 -DNRF51_S132
-neoPLCv2.menu.softdevice.s132.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
+neoPLCv1.menu.softdevice.s132=S132
+neoPLCv1.menu.softdevice.s132.softdevice=s132
+neoPLCv1.menu.softdevice.s132.softdeviceversion=2.0.1
+neoPLCv1.menu.softdevice.s132.upload.maximum_size=372000
+neoPLCv1.menu.softdevice.s132.build.extra_flags=-DNRF52 -DS132 -DNRF51_S132
+neoPLCv1.menu.softdevice.s132.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
 
-neoPLCv2.menu.lfclk.lfrc=RC Oscillator
-neoPLCv2.menu.lfclk.lfrc.build.lfclk_flags=-DUSE_LFRC
-neoPLCv2.menu.lfclk.lfsynt=Synthesized
-neoPLCv2.menu.lfclk.lfsynt.build.lfclk_flags=-DUSE_LFSYNT
+neoPLCv1.menu.lfclk.lfrc=RC Oscillator
+neoPLCv1.menu.lfclk.lfrc.build.lfclk_flags=-DUSE_LFRC
+neoPLCv1.menu.lfclk.lfsynt=Synthesized
+neoPLCv1.menu.lfclk.lfsynt.build.lfclk_flags=-DUSE_LFSYNT
 
-neoPLCv2.menu.nfcprotect.off = OFF
-neoPLCv2.menu.nfcprotect.off.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_GPIOS
-neoPLCv2.menu.nfcprotect.on = ON
-neoPLCv2.menu.nfcprotect.on.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_NFCT
-
-#neoPLCv2_1
-#################################################################################
-neoPLCv2_1.name=neoPLC 2.1
-
-neoPLCv2_1.vid.0=0x10c4
-neoPLCv2_1.pid.0=0xea60
-
-neoPLCv2_1.upload.tool=nRFgo
-neoPLCv2_1.upload.protocol=
-neoPLCv2_1.upload.interface=jlink
-neoPLCv2_1.upload.target=nrf52
-neoPLCv2_1.upload.maximum_size=372000
-neoPLCv2_1.upload.setup_command=transport select swd;
-neoPLCv2_1.upload.use_1200bps_touch=false
-neoPLCv2_1.upload.wait_for_upload_port=false
-neoPLCv2_1.upload.native_usb=false
-
-neoPLCv2_1.bootloader.tool=openocd
-
-neoPLCv2_1.build.mcu=cortex-m4
-neoPLCv2_1.build.f_cpu=16000000
-neoPLCv2_1.build.board=NRF52_DK
-neoPLCv2_1.build.core=nRF5
-neoPLCv2_1.build.variant=neoPLCv2_1
-neoPLCv2_1.build.variant_system_lib=
-neoPLCv2_1.build.extra_flags=-DNRF52
-neoPLCv2_1.build.float_flags=-mfloat-abi=hard -mfpu=fpv4-sp-d16
-neoPLCv2_1.build.ldscript=nrf52_xxaa.ld
-
-neoPLCv2_1.menu.softdevice.s132=S132
-neoPLCv2_1.menu.softdevice.s132.softdevice=s132
-neoPLCv2_1.menu.softdevice.s132.softdeviceversion=2.0.1
-neoPLCv2_1.menu.softdevice.s132.upload.maximum_size=372000
-neoPLCv2_1.menu.softdevice.s132.build.extra_flags=-DNRF52 -DS132 -DNRF51_S132
-neoPLCv2_1.menu.softdevice.s132.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
-neoPLCv2_1.menu.softdevice.none=None
-neoPLCv2_1.menu.softdevice.none.softdevice=none
-
-neoPLCv2_1.menu.lfclk.lfrc=RC Oscillator
-neoPLCv2_1.menu.lfclk.lfrc.build.lfclk_flags=-DUSE_LFRC
-neoPLCv2_1.menu.lfclk.lfsynt=Synthesized
-neoPLCv2_1.menu.lfclk.lfsynt.build.lfclk_flags=-DUSE_LFSYNT
-neoPLCv2_1.menu.lfclk.lfxo=Crystal Oscillator
-neoPLCv2_1.menu.lfclk.lfxo.build.lfclk_flags=-DUSE_LFXO
-
-neoPLCv2_1.menu.nfcprotect.off = OFF
-neoPLCv2_1.menu.nfcprotect.off.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_GPIOS
-neoPLCv2_1.menu.nfcprotect.on = ON
-neoPLCv2_1.menu.nfcprotect.on.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_NFCT
+neoPLCv1.menu.nfcprotect.off = OFF
+neoPLCv1.menu.nfcprotect.off.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_GPIOS
+neoPLCv1.menu.nfcprotect.on = ON
+neoPLCv1.menu.nfcprotect.on.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_NFCT
 
