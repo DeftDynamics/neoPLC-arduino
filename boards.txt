@@ -17,11 +17,7 @@
 
 #menu setup
 #################################################################################
-menu.chip=Chip
-menu.softdevice=Softdevice
-menu.version=Version
-menu.lfclk=Low Frequency Clock
-menu.nfcprotect=NFC Protect
+
 
 #neoPLCv1
 #################################################################################
@@ -32,7 +28,7 @@ neoPLCv1.pid.0=0xea60
 
 neoPLCv1.upload.tool=nRFgo
 neoPLCv1.upload.protocol=
-neoPLCv1.upload.interface=jlink
+neoPLCv1.upload.interface=
 neoPLCv1.upload.target=nrf52
 neoPLCv1.upload.maximum_size=372000
 neoPLCv1.upload.setup_command=transport select swd;
@@ -43,27 +39,10 @@ neoPLCv1.upload.native_usb=false
 neoPLCv1.build.mcu=cortex-m4
 neoPLCv1.build.f_cpu=16000000
 neoPLCv1.build.board=NRF52_DK
-neoPLCv1.build.core=nRF5
+neoPLCv1.build.core=nRF52
 neoPLCv1.build.variant=neoPLCv1
 neoPLCv2.build.variant_system_lib=
 neoPLCv1.build.extra_flags=-DNRF52
 neoPLCv1.build.float_flags=-mfloat-abi=hard -mfpu=fpv4-sp-d16
 neoPLCv1.build.ldscript=nrf52_xxaa.ld
-
-neoPLCv1.menu.softdevice.s132=S132
-neoPLCv1.menu.softdevice.s132.softdevice=s132
-neoPLCv1.menu.softdevice.s132.softdeviceversion=2.0.1
-neoPLCv1.menu.softdevice.s132.upload.maximum_size=372000
-neoPLCv1.menu.softdevice.s132.build.extra_flags=-DNRF52 -DS132 -DNRF51_S132
-neoPLCv1.menu.softdevice.s132.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
-
-neoPLCv1.menu.lfclk.lfrc=RC Oscillator
-neoPLCv1.menu.lfclk.lfrc.build.lfclk_flags=-DUSE_LFRC
-neoPLCv1.menu.lfclk.lfsynt=Synthesized
-neoPLCv1.menu.lfclk.lfsynt.build.lfclk_flags=-DUSE_LFSYNT
-
-neoPLCv1.menu.nfcprotect.off = OFF
-neoPLCv1.menu.nfcprotect.off.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_GPIOS
-neoPLCv1.menu.nfcprotect.on = ON
-neoPLCv1.menu.nfcprotect.on.build.nfc_flags = -DCONFIG_NFCT_PINS_AS_NFCT
 

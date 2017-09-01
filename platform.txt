@@ -49,8 +49,9 @@ compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=
 
 # this can be overriden in boards.txt
-build.extra_flags=
-build.lfclk_flags=
+build.extra_flags= -DNRF52 -DS132 -DNRF51_S132
+build.lfclk_flags= -DUSE_LFRC
+build.nfc_flags = -DCONFIG_NFCT_PINS_AS_GPIOS
 
 nrf.sdk.path={build.core.path}/SDK
 
