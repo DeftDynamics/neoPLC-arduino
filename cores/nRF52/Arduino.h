@@ -41,8 +41,6 @@ void loop( void ) ;
 } // extern "C"
 #endif
 
-#include "elapsedMillis.h"
-
 // The following headers are for C++ only compilation
 #ifdef __cplusplus
   #include "WCharacter.h"
@@ -57,6 +55,9 @@ void loop( void ) ;
 #ifdef __cplusplus
   #include "Uart.h"
 #endif
+
+#include "elapsedMillis.h"
+
 
 // Include board variant
 #include "variant.h"
