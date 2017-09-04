@@ -44,5 +44,5 @@ neoPLCv1.build.variant=neoPLCv1
 neoPLCv1.build.variant_system_lib=
 neoPLCv1.build.extra_flags=-DNRF52
 neoPLCv1.build.float_flags=-mfloat-abi=hard -mfpu=fpv4-sp-d16
-neoPLCv1.build.ldscript=nrf52_xxaa.ld
+neoPLCv1.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
 
