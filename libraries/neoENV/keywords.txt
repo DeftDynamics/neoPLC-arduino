@@ -2,16 +2,13 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-neoPWM	KEYWORD1
+neoENV	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
-begin		KEYWORD2
-reset		KEYWORD2
-setPWMFreq	KEYWORD2
-setPWM		KEYWORD2
-analogWrite	KEYWORD2
-zeroAll		KEYWORD2
-softPWM		KEYWORD2
+begin 		KEYWORD2
+readTemperature	KEYWORD2
+readPressure	KEYWORD2
+readHumidity	KEYWORD2
+readAltitude	KEYWORD2

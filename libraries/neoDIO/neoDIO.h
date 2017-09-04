@@ -1,17 +1,15 @@
 // library for neoPLC-DIO
-// adapted from code by adafruit
 
 #ifndef NEODIO_H_
 #define NEODIO_H_
 
 #include "Arduino.h"
 #include <Wire.h>
-#define MCP23017_ADDRESS 0x27
 
 class neoDIO {
   
   public:
-    neoDIO();
+    neoDIO(uint8_t addr=0x27);
     void begin(void);
     void pinMode(uint8_t p, uint8_t d);
     void digitalWrite(uint8_t p, uint8_t d);
@@ -19,7 +17,7 @@ class neoDIO {
     uint8_t digitalRead(uint8_t p);
 
  private:
-    uint8_t i2caddr = MCP23017_ADDRESS;
+    uint8_t i2caddr = 0x27;
     uint8_t regForPin(uint8_t pin, uint8_t portAaddr, uint8_t portBaddr);
     uint8_t readRegister(uint8_t addr);
     void writeRegister(uint8_t addr, uint8_t value);

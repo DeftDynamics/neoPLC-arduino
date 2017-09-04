@@ -1,10 +1,8 @@
 // neoPLC-PWM Demo
-// adapted from code by Limor Fried (Adafruit Industries)
 
-#include <Wire.h>
 #include "neoPWM.h"
 
-neoPWM pwm;
+neoPWM pwm = neoPWM();
 
 bool led_state = true;
 
@@ -53,5 +51,10 @@ void regulateLoop(float dt)
   prev_time = micros();
 }
 
+void shutdownISR(){
+  // this function is called when the program shuts down (like for re-programming)
+  // turn off all output to be safe
+  pwm.zeroAll();
+}
 
 

@@ -1,11 +1,10 @@
-// neoPLC-PWM
-// adapted from code by Limor Fried (Adafruit Industries)
+// neoPLC-PWM Library
 
 #include "neoPWM.h"
 #include <Wire.h>
 
-neoPWM::neoPWM() {
-  _i2caddr = 0x43;
+neoPWM::neoPWM(uint8_t addr) {
+  _i2caddr = addr;
 }
 
 void neoPWM::reset(void) {
@@ -91,6 +90,17 @@ void neoPWM::zeroAll()
     for(int i = 0; i<16; i++){
 		setPWM(i, 0, 4096);
 	}
+}
+
+void neoPWM::softPWM(uint16_t PWM_vals[8])
+{
+  // smooth the current flow by shifting periods of HIGH signal between channels
+  int PWM_sum = 0;
+  for (uint8_t i=0; i<8; i++){
+    uint16_t off = PWM_sum;                 // off until end of earlier commands 
+    PWM_sum = (PWM_sum+PWM_vals[i]) % 4095; // on until end of earlier commands + new command mod 1.0
+    setPWM(i,off,PWM_sum);
+  }
 }
 
 uint8_t neoPWM::read8(uint8_t addr) {

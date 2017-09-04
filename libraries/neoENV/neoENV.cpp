@@ -1,12 +1,15 @@
 // neoPLC-ENV environmental sensor library
-// adapted from official BME280 code (Bosch) and Adafruit Breakout code  http://www.adafruit.com/products/2650
+// adapted from official BME280 code (Bosch) and Adafruit
 #include "Arduino.h"
 #include <Wire.h>
 #include <SPI.h>
 #include "neoENV.h"
 
-neoENV::neoENV()
-{}
+neoENV::neoENV(uint8_t addr)
+{
+  // constructor
+  _i2caddr = addr;
+}
 
 bool neoENV::begin()
 {

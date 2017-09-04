@@ -1,8 +1,7 @@
-// neoPLC-PWM
-// adapted from code by Limor Fried (Adafruit Industries)
+// neoPLC-PWM Library
 
-#ifndef NEOPWM_H
-#define NEOPWM_H
+#ifndef __NEOPWM_H__
+#define __NEOPWM_H__
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -30,13 +29,14 @@
 
 class neoPWM {
  public:
-  neoPWM();
+  neoPWM(uint8_t addr=0x43) ;
   void begin(float freq);
   void reset(void);
   void setPWMFreq(float freq);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
   void analogWrite(uint8_t num, uint16_t val, bool invert=false);
   void zeroAll();
+  void softPWM(uint16_t PWM_vals[8]);
 
  private:
   uint8_t _i2caddr = 0x43;

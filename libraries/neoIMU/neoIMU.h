@@ -1,17 +1,9 @@
-/***************************************************
-* Module name: neoPLC IMU library
-*
-* Copyright 2016 Deft Dynamics
-* All Rights Reserved.
-*
-* First written on 8/27/16 by Austin Gurley.
-*
-* Module Description:
-* control and communication library for the BMX055 9-axis inertial measurement unit
-* derived from code by Kris Wiener
-*
-***************************************************/
+// neoPLC-IMU library
+// Deft Dynamics
 
+
+#ifndef __NEOIMU_H__
+#define __NEOIMU_H__
 
 /* potential values for setup:
 
@@ -31,13 +23,6 @@ Magnetometer Output Rate:
 
 #include "arduino.h"
 #include <Wire.h>
-
-
-// Using the default neoPLC address wiring, SDO1 = SDO2 = CSB3 = PWR as designed
-// Seven-bit device addresses are ACC = 0x19, GYRO = 0x69, MAG = 0x13
-#define BMX055_ACC_ADDR  0x19   // Address of BMX055 accelerometer
-#define BMX055_GYRO_ADDR 0x69   // Address of BMX055 gyroscope
-#define BMX055_MAG_ADDR  0x13   // Address of BMX055 magnetometer
 
 // Accelerometer registers
 #define BMX055_ACC_WHOAMI        0x00   // should return 0xFA
@@ -203,10 +188,10 @@ Magnetometer Output Rate:
 #define BMM050_DIG_XY1            0x71  
 
 
-class neoPLC_IMU {
+class neoIMU {
   public:
    // constructor
-    neoPLC_IMU();
+    neoIMU(uint8_t addr_a = 0x19, uint8_t addr_g = 0x69, uint8_t addr_m = 0x13);
     // initialize the BMX055, set range and bandwidth
     bool begin(int acc_range = 2, int acc_bw = 125, int gyro_range = 250, int gyro_bw = 116, int mag_odr = 30);
     // read accelerometers
@@ -224,6 +209,9 @@ class neoPLC_IMU {
 
 
   private:
+    uint8_t _addr_acc = 0x19;
+    uint8_t _addr_gyr = 0x69;
+    uint8_t _addr_mag = 0x13;
   
     float  accVals[3]; // store accelerometer values
     float gyroVals[3]; // store gyroscope values
@@ -254,3 +242,4 @@ class neoPLC_IMU {
     uint16_t      _dig_xyz1;
 };
 
+#endif

@@ -1,6 +1,4 @@
-// neoGPS Library Test
-// (c) Deft Dynamics 2017
-// by Austin Gurley
+// neoPLC-GPS Demo
 
 /* 
  This is a library for communicating with uBlox GPS modules viaI2C.
@@ -17,9 +15,8 @@
 
 
 #include "neoGPS.h"
-#include <Wire.h>
 
-neoGPS gps;
+neoGPS gps = neoGPS();
 
 bool led_state = true;
   

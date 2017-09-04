@@ -1,17 +1,19 @@
-// neoPLC IMU library
-// for BMX055 9-axis inertial measurement unit
-// based on code by Kris Wiener
+// neoPLC-IMU library
+// Deft Dynamics
 
 #include "arduino.h"
 #include "neoIMU.h"
 #include <Wire.h>
 
-neoPLC_IMU::neoPLC_IMU()
+neoIMU::neoIMU(uint8_t addr_a, uint8_t addr_g, uint8_t addr_m)
 {
   // constructor
+    uint8_t _addr_acc = addr_a;
+    uint8_t _addr_gyr = addr_g;
+    uint8_t _addr_mag = addr_m;
 }
 
-bool neoPLC_IMU::begin(int acc_range, int acc_bw, int gyro_range, int gyro_bw, int mag_odr)
+bool neoIMU::begin(int acc_range, int acc_bw, int gyro_range, int gyro_bw, int mag_odr)
 {
   Wire.begin();
   Wire.setClock(250000);
@@ -20,14 +22,14 @@ bool neoPLC_IMU::begin(int acc_range, int acc_bw, int gyro_range, int gyro_bw, i
   uint8_t c=0;
   
   // start with all sensors in default mode with all registers reset
-   writeByte(BMX055_ACC_ADDR,  BMX055_ACC_BGW_SOFTRESET, 0xB6);  // reset accelerometer
+   writeByte(_addr_acc,  BMX055_ACC_BGW_SOFTRESET, 0xB6);  // reset accelerometer
    delay(500); // Wait for all registers to reset 
 
-  a = readByte(BMX055_ACC_ADDR, BMX055_ACC_WHOAMI) == 0xFA;  // Read acc WHO_AM_I register and check value
-  b = readByte(BMX055_GYRO_ADDR, BMX055_GYRO_WHOAMI) == 0x0F;  // Read gyro WHO_AM_I register and check value
-      writeByte(BMX055_MAG_ADDR, BMX055_MAG_PWR_CNTL1, 0x01); // wake up magnetometer
+  a = readByte(_addr_acc, BMX055_ACC_WHOAMI) == 0xFA;  // Read acc WHO_AM_I register and check value
+  b = readByte(_addr_gyr, BMX055_GYRO_WHOAMI) == 0x0F;  // Read gyro WHO_AM_I register and check value
+      writeByte(_addr_mag, BMX055_MAG_PWR_CNTL1, 0x01); // wake up magnetometer
       delay(10);
-  c = readByte(BMX055_MAG_ADDR, BMX055_MAG_WHOAMI) == 0x32 ;  // Read mag WHO_AM_I register and check value
+  c = readByte(_addr_mag, BMX055_MAG_WHOAMI) == 0x32 ;  // Read mag WHO_AM_I register and check value
 
   if ( a & b & c ) // if all 3 sensors connect, complete the setup and return success flag
   {
@@ -42,13 +44,13 @@ bool neoPLC_IMU::begin(int acc_range, int acc_bw, int gyro_range, int gyro_bw, i
   }
 }
 
-void neoPLC_IMU::pollAccel()
+void neoIMU::pollAccel()
 {
   uint8_t rawData[6];
   int16_t raw_ax;
   int16_t raw_ay;
   int16_t raw_az;
-  readBytes(BMX055_ACC_ADDR, BMX055_ACC_D_X_LSB, 6, &rawData[0]);      
+  readBytes(_addr_acc, BMX055_ACC_D_X_LSB, 6, &rawData[0]);      
   if((rawData[0] & 0x01) && (rawData[2] & 0x01) && (rawData[4] & 0x01)) 
   { 
     raw_ax = (int16_t) (((int16_t)rawData[1] << 8) | rawData[0]) >> 4;  // Turn the MSB and LSB into a signed 12-bit value
@@ -60,13 +62,13 @@ void neoPLC_IMU::pollAccel()
   }
 }
 
-void neoPLC_IMU::pollGyro()
+void neoIMU::pollGyro()
 {
   uint8_t rawData[6];
   int16_t raw_gx;
   int16_t raw_gy;
   int16_t raw_gz;
-  readBytes(BMX055_GYRO_ADDR, BMX055_GYRO_RATE_X_LSB, 6, &rawData[0]);  // Read the six raw data registers sequentially into data array
+  readBytes(_addr_gyr, BMX055_GYRO_RATE_X_LSB, 6, &rawData[0]);  // Read the six raw data registers sequentially into data array
     raw_gx = (int16_t) (((int16_t)rawData[1] << 8) | rawData[0]);   // Turn the MSB and LSB into a signed 16-bit value
     raw_gy = (int16_t) (((int16_t)rawData[3] << 8) | rawData[2]);  
     raw_gz = (int16_t) (((int16_t)rawData[5] << 8) | rawData[4]); 
@@ -75,7 +77,7 @@ void neoPLC_IMU::pollGyro()
     gz = (float)raw_gz*_gyro_res;
 }
 
-void neoPLC_IMU::pollMag()
+void neoIMU::pollMag()
 {
   int16_t mdata_x = 0, mdata_y = 0, mdata_z = 0, temp = 0;
   uint16_t data_r = 0;
@@ -84,7 +86,7 @@ void neoPLC_IMU::pollMag()
   int16_t raw_my=0;
   int16_t raw_mz=0;
   
-  readBytes(BMX055_MAG_ADDR, BMX055_MAG_XOUT_LSB, 8, &rawData[0]);  // Read the eight raw data registers sequentially into data array
+  readBytes(_addr_mag, BMX055_MAG_XOUT_LSB, 8, &rawData[0]);  // Read the eight raw data registers sequentially into data array
     if(rawData[6] & 0x01) // data ready
     {
       mdata_x = (int16_t) (((int16_t)rawData[1] << 8) | rawData[0]) >> 3;  // 13-bit signed integer for x-axis field
@@ -112,22 +114,22 @@ void neoPLC_IMU::pollMag()
    }
 }
 
-float neoPLC_IMU::readTemp()
+float neoIMU::readTemp()
 {
-  int c =  readByte(BMX055_ACC_ADDR, BMX055_ACC_D_TEMP);  // Read the raw data register (8-bit = 1-byte)
+  int c =  readByte(_addr_acc, BMX055_ACC_D_TEMP);  // Read the raw data register (8-bit = 1-byte)
   int16_t t = ((int16_t)((int16_t)c << 8)) >> 8;
   float temp = ((float)t/1.42+23); // read accelerometer temp and convert to deg C
   return temp;  // Turn the byte into a signed 8-bit integer
 }
 
-void neoPLC_IMU::pollAll()
+void neoIMU::pollAll()
 {
   pollAccel(); // update acceleration in Gs IF new data is available
   pollGyro(); // update rotation rate in deg/s 
   pollMag(); // update magnetic flux in mGauss IF new data is available
 }
 
-void neoPLC_IMU::setupAcc(int acc_range, int acc_bw)
+void neoIMU::setupAcc(int acc_range, int acc_bw)
 {
   uint8_t Ascale = 0x03;
   switch (acc_range)
@@ -172,19 +174,19 @@ void neoPLC_IMU::setupAcc(int acc_range, int acc_bw)
       Abw = 0x04; break; // default to: 125  Hz,  4 ms update time
   }
   
-   writeByte(BMX055_ACC_ADDR, BMX055_ACC_PMU_RANGE, Ascale & 0x0F);    // Set accelerometer full range
-   writeByte(BMX055_ACC_ADDR, BMX055_ACC_PMU_BW, (0x08 | Abw) & 0x0F); // Set accelerometer bandwidth
-   writeByte(BMX055_ACC_ADDR, BMX055_ACC_D_HBW, 0x00);                  // Use filtered data
+   writeByte(_addr_acc, BMX055_ACC_PMU_RANGE, Ascale & 0x0F);    // Set accelerometer full range
+   writeByte(_addr_acc, BMX055_ACC_PMU_BW, (0x08 | Abw) & 0x0F); // Set accelerometer bandwidth
+   writeByte(_addr_acc, BMX055_ACC_D_HBW, 0x00);                  // Use filtered data
 
-    _dig_x1 = readByte(BMX055_ACC_ADDR, BMM050_DIG_X1);
-    _dig_x2 = readByte(BMX055_ACC_ADDR, BMM050_DIG_X2);
-    _dig_y1 = readByte(BMX055_ACC_ADDR, BMM050_DIG_Y1);
-    _dig_y2 = readByte(BMX055_ACC_ADDR, BMM050_DIG_Y2);
-    _dig_xy1 = readByte(BMX055_ACC_ADDR, BMM050_DIG_XY1);
-    _dig_xy2 = readByte(BMX055_ACC_ADDR, BMM050_DIG_XY2);
+    _dig_x1 = readByte(_addr_acc, BMM050_DIG_X1);
+    _dig_x2 = readByte(_addr_acc, BMM050_DIG_X2);
+    _dig_y1 = readByte(_addr_acc, BMM050_DIG_Y1);
+    _dig_y2 = readByte(_addr_acc, BMM050_DIG_Y2);
+    _dig_xy1 = readByte(_addr_acc, BMM050_DIG_XY1);
+    _dig_xy2 = readByte(_addr_acc, BMM050_DIG_XY2);
 }
 
-void neoPLC_IMU::setupGyro(int gyro_range, int gyro_bw)
+void neoIMU::setupGyro(int gyro_range, int gyro_bw)
 {
   uint8_t Gscale = 0x03;
   switch (gyro_range)
@@ -232,12 +234,12 @@ void neoPLC_IMU::setupGyro(int gyro_range, int gyro_bw)
       Gbw = 0x02; break; // default to: 1000 Hz ODR, 116 Hz BW
   }
   
-  writeByte(BMX055_GYRO_ADDR, BMX055_GYRO_RANGE, Gscale);  // set GYRO FS range
-  writeByte(BMX055_GYRO_ADDR, BMX055_GYRO_BW, Gbw);     // set GYRO ODR and Bandwidth
+  writeByte(_addr_gyr, BMX055_GYRO_RANGE, Gscale);  // set GYRO FS range
+  writeByte(_addr_gyr, BMX055_GYRO_BW, Gbw);     // set GYRO ODR and Bandwidth
 
 }
 
-void neoPLC_IMU::setupMag(int mag_odr)
+void neoIMU::setupMag(int mag_odr)
 {
     uint8_t Mbw;
   switch (mag_odr)
@@ -264,7 +266,7 @@ void neoPLC_IMU::setupMag(int mag_odr)
   
   //writeByte(BMX055_MAG_ADDR, BMX055_MAG_PWR_CNTL1, 0x82);  // Softreset magnetometer, ends up in sleep mode
   //writeByte(BMX055_MAG_ADDR, BMX055_MAG_PWR_CNTL1, 0x01); // Wake up magnetometer
-  writeByte(BMX055_MAG_ADDR, BMX055_MAG_PWR_CNTL2, Mbw << 3); // Normal mode
+  writeByte(_addr_mag, BMX055_MAG_PWR_CNTL2, Mbw << 3); // Normal mode
   
          // Low-power
        //   writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_XY, 0x01);  // 3 repetitions (oversampling)
@@ -273,8 +275,8 @@ void neoPLC_IMU::setupMag(int mag_odr)
        //   writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_XY, 0x04);  //  9 repetitions (oversampling)
        //   writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_Z,  0x16);  // 15 repetitions (oversampling)
           // Enhanced Regular
-          writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_XY, 0x07);  // 15 repetitions (oversampling)
-          writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_Z,  0x22);  // 27 repetitions (oversampling)
+          writeByte(_addr_mag, BMX055_MAG_REP_XY, 0x07);  // 15 repetitions (oversampling)
+          writeByte(_addr_mag, BMX055_MAG_REP_Z,  0x22);  // 27 repetitions (oversampling)
           // High Accuracy
         //  writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_XY, 0x17);  // 47 repetitions (oversampling)
         //  writeByte(BMX055_MAG_ADDR, BMX055_MAG_REP_Z,  0x51);  // 83 repetitions (oversampling)
@@ -282,21 +284,21 @@ void neoPLC_IMU::setupMag(int mag_odr)
 
       
         uint8_t rawData[2];  //placeholder for 2-byte trim data
-          readBytes(BMX055_MAG_ADDR, BMM050_DIG_Z1_LSB, 2, &rawData[0]);   
+          readBytes(_addr_mag, BMM050_DIG_Z1_LSB, 2, &rawData[0]);   
         _dig_z1 = (uint16_t) (((uint16_t)rawData[1] << 8) | rawData[0]);  
-          readBytes(BMX055_MAG_ADDR, BMM050_DIG_Z2_LSB, 2, &rawData[0]);   
+          readBytes(_addr_mag, BMM050_DIG_Z2_LSB, 2, &rawData[0]);   
         _dig_z2 = (int16_t) (((int16_t)rawData[1] << 8) | rawData[0]);  
-          readBytes(BMX055_MAG_ADDR, BMM050_DIG_Z3_LSB, 2, &rawData[0]);   
+          readBytes(_addr_mag, BMM050_DIG_Z3_LSB, 2, &rawData[0]);   
         _dig_z3 = (int16_t) (((int16_t)rawData[1] << 8) | rawData[0]);  
-          readBytes(BMX055_MAG_ADDR, BMM050_DIG_Z4_LSB, 2, &rawData[0]);   
+          readBytes(_addr_mag, BMM050_DIG_Z4_LSB, 2, &rawData[0]);   
         _dig_z4 = (int16_t) (((int16_t)rawData[1] << 8) | rawData[0]);  
-         readBytes(BMX055_MAG_ADDR, BMM050_DIG_XYZ1_LSB, 2, &rawData[0]);   
+          readBytes(_addr_mag, BMM050_DIG_XYZ1_LSB, 2, &rawData[0]);   
         _dig_xyz1 = (uint16_t) (((uint16_t)rawData[1] << 8) | rawData[0]);  
 
         _mag_res =  1.0/1.6;
 }
 
-void neoPLC_IMU::writeByte(uint8_t ic_address , uint8_t reg_address, uint8_t byte_to_send)
+void neoIMU::writeByte(uint8_t ic_address , uint8_t reg_address, uint8_t byte_to_send)
 {
   Wire.beginTransmission(ic_address);
   Wire.write(reg_address);
@@ -304,7 +306,7 @@ void neoPLC_IMU::writeByte(uint8_t ic_address , uint8_t reg_address, uint8_t byt
   Wire.endTransmission();
 }
 
-uint8_t neoPLC_IMU::readByte(uint8_t ic_address, uint8_t reg_address)
+uint8_t neoIMU::readByte(uint8_t ic_address, uint8_t reg_address)
 {
   uint8_t message;
   Wire.beginTransmission(ic_address);
@@ -315,7 +317,7 @@ uint8_t neoPLC_IMU::readByte(uint8_t ic_address, uint8_t reg_address)
   return message;
 }
 
-void neoPLC_IMU::readBytes(uint8_t ic_address, uint8_t reg_address, uint8_t num_bytes, uint8_t *output_location)
+void neoIMU::readBytes(uint8_t ic_address, uint8_t reg_address, uint8_t num_bytes, uint8_t *output_location)
 {
   uint8_t i = 0;
   Wire.beginTransmission(ic_address);

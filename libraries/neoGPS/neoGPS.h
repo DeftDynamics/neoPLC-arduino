@@ -1,6 +1,5 @@
 /*
-  neoGPS.cpp - UBlox Core Messaging System
-  Proprietary Deft Dynamics 2017
+  neoPLC-GPS Library
 
  This is a library for communicating with uBlox GPS modules
  Based on "u-blox 8 / u-blox M8 Receiver Description" (UBX-13003221 - R13)
@@ -8,8 +7,8 @@
 
 */
 
-#ifndef neoGPS_h
-#define neoGPS_h
+#ifndef __NEOGPS_H__
+#define __NEOGPS_H__
 
 #include "Arduino.h"
 #include <Wire.h>
@@ -83,8 +82,6 @@
 #define R1087 0x57
 #define R1230 0xE6
 
-#define DDC_ADDRESS 0x42
-
 class neoGPS
 {
   
@@ -106,7 +103,7 @@ class neoGPS
 
 // ------------------------------------ Public Variables & Methods -------------------------------------
  public:
-    neoGPS();
+    neoGPS(uint8_t addr = 0x42);
     void begin(uint32_t Rate);
  uint8_t poll();
     
@@ -267,7 +264,7 @@ class neoGPS
 // ------------------------------------ Private Variables & Methods -------------------------------------
  private:
  
-uint16_t _address = DDC_ADDRESS;
+uint16_t _address = 0x42;
  uint8_t encode(char c);
  uint8_t parse(char *buffer);
     void configMessageRate(uint8_t CL, uint8_t ID, uint8_t IsOn);

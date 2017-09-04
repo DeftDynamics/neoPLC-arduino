@@ -1,16 +1,15 @@
 // library for neoPLC-DIO
-// adapted from code by adafruit
 
 #include "Arduino.h"
 #include "neoDIO.h"
 #include <Wire.h>
 
-neoDIO::neoDIO(){
+neoDIO::neoDIO(uint8_t addr){
    // constructor
+   i2caddr = addr;
 }
 
 void neoDIO::begin() {
-	i2caddr = MCP23017_ADDRESS;
 	Wire.begin();
 	writeRegister(MCP23017_IODIRA,0xff);
 	writeRegister(MCP23017_IODIRB,0xff);
@@ -38,15 +37,15 @@ uint8_t neoDIO::digitalRead(uint8_t pin) {
 // -----------------------------------------------------------------
 
 uint8_t neoDIO::readRegister(uint8_t addr){
-  Wire.beginTransmission(MCP23017_ADDRESS);
+  Wire.beginTransmission(i2caddr);
   Wire.write(addr);
   Wire.endTransmission();
-  Wire.requestFrom(MCP23017_ADDRESS, 1);
+  Wire.requestFrom(i2caddr, 1);
   return Wire.read();
 }
 
 void neoDIO::writeRegister(uint8_t regAddr, uint8_t regValue){
-  Wire.beginTransmission(MCP23017_ADDRESS);
+  Wire.beginTransmission(i2caddr);
   Wire.write(regAddr);
   Wire.write(regValue);
   Wire.endTransmission();

@@ -1,5 +1,5 @@
 // neoPLC-ENV environmental sensor library
-// adapted from official BME280 code (Bosch) and Adafruit Breakout code  http://www.adafruit.com/products/2650
+// adapted from official BME280 code (Bosch) and Adafruit
 
 #ifndef __NEOENV_H__
 #define __NEOENV_H__
@@ -12,7 +12,6 @@
 
 #include <Wire.h>
 
-#define ADDRESS 0x77
 #define SEALEVELPRESSURE_HPA 1013.25
 
     enum
@@ -115,7 +114,7 @@ class neoENV {
         };
     
         // constructors
-        neoENV(void);
+        neoENV(uint8_t addr=0x77);
         
         bool begin();
 
@@ -136,7 +135,6 @@ class neoENV {
     private:
         void readCoefficients(void);
         bool isReadingCalibration(void);
-        uint8_t spixfer(uint8_t x);
 
         void      write8(byte reg, byte value);
         uint8_t   read8(byte reg);
@@ -146,7 +144,7 @@ class neoENV {
         uint16_t  read16_LE(byte reg); // little endian
         int16_t   readS16_LE(byte reg); // little endian
 
-        uint8_t   _i2caddr = ADDRESS;
+        uint8_t   _i2caddr = 0x77;
         int32_t   _sensorID;
         int32_t   t_fine;
 

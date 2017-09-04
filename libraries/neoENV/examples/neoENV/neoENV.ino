@@ -1,7 +1,9 @@
-#include <Wire.h>
+// neoPLC-ENV Demo
+
 #include "neoENV.h"
 
-neoENV env;
+neoENV env = neoENV();
+
 bool led_state = true;
 
 // -------- Setup --------

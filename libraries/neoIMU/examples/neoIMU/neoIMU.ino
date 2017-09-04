@@ -1,7 +1,9 @@
-#include <Wire.h>             // i2c serial
-#include "neoPLC_IMU.h"       // Bosch BMX055 setup and parse
+// neoPLC-IMU Demo
 
-neoPLC_IMU imu = neoPLC_IMU();
+#include "neoIMU.h"       // Bosch BMX055 setup and parse
+
+neoIMU imu = neoIMU();
+
 float ax, ay, az, gx, gy, gz, mx, my, mz;       // variables to hold latest sensor data values 
 
 uint32_t loop_time = 0;

@@ -2,16 +2,14 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-neoPWM	KEYWORD1
+neoDIO	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
 begin		KEYWORD2
-reset		KEYWORD2
-setPWMFreq	KEYWORD2
-setPWM		KEYWORD2
-analogWrite	KEYWORD2
-zeroAll		KEYWORD2
-softPWM		KEYWORD2
+pinMode		KEYWORD2
+digitalWrite	KEYWORD2
+pullUp 		KEYWORD2
+digitalRead	KEYWORD2
+

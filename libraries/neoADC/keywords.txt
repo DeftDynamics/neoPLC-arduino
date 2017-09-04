@@ -2,13 +2,12 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-neoADS	KEYWORD1
+neoADC	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-init 		KEYWORD2
-setVREF		KEYWORD2
+begin 		KEYWORD2
 read		KEYWORD2
 
 #######################################
@@ -21,4 +20,4 @@ INT 		LITERAL1
 
 ## Channel ending modes
 SD			LITERAL1
-FD			LITERAL1
+DF			LITERAL1

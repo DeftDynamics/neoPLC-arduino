@@ -4,11 +4,9 @@
 #include "neoADC.h"
 #include "Wire.h"
 
-int ads_address = 0x48;
-bool ads_vref_int_enabled = 0;
-unsigned char channels[8] = {0x00, 0x40, 0x10, 0x50, 0x20, 0x60, 0x30, 0x70}; 
-neoADC::neoADC(){
+neoADC::neoADC(uint8_t addr){
    // constructor
+   ads_address = addr;
 }
 
 void neoADC::begin(){

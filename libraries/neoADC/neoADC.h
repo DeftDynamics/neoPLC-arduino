@@ -17,9 +17,13 @@ class neoADC
 {  
 
 public:
-  neoADC();
+  neoADC(uint8_t addr=0x48);
   void begin();
   float read(unsigned char channel, bool mode=1);
+private:
+  int ads_address = 0x48;
+  bool ads_vref_int_enabled = 0;
+  unsigned char channels[8] = {0x00, 0x40, 0x10, 0x50, 0x20, 0x60, 0x30, 0x70}; 
 };
 
 

@@ -1,7 +1,8 @@
-#include <Wire.h>
+// neoPLC-ADC Demo
+
 #include "neoADC.h"
 
-neoADC adc;
+neoADC adc = neoADC();
 
 bool led_state = true;
 

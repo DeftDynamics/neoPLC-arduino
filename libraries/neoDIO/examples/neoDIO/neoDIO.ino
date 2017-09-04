@@ -1,7 +1,8 @@
-#include <Wire.h>
+// neoPLC-DIO Demo
+
 #include "neoDIO.h"
 
-neoDIO dio;
+neoDIO dio = neoDIO();
 
 bool led_state = LOW;
 

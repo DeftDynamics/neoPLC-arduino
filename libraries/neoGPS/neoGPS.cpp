@@ -1,6 +1,5 @@
 /*
-  neoGPS.cpp - UBlox Core Messaging System
-  Proprietary Deft Dynamics 2017
+  neoPLC-GPS Library
 
  This is a library for communicating with uBlox GPS modules
  Based on "u-blox 8 / u-blox M8 Receiver Description" (UBX-13003221 - R13)
@@ -11,17 +10,17 @@
 #include "neoGPS.h"
 #include <Wire.h>
 
-neoGPS::neoGPS()
+neoGPS::neoGPS(uint8_t addr)
 {
   // constructor
+  _address = addr;
 }
 
 void neoGPS::begin(uint32_t Rate)
 {
-    uint32_t address = 0x42;
+    uint32_t address = _address;
     Wire.begin();
     configDDCPort(address, 1,0,0, 1,0,0); // set I2C Address and protocols: transmits on UBX only
-    _address = address;
   
      waitForAckNack();
      
@@ -61,7 +60,7 @@ void neoGPS::configDDCPort(uint32_t address, bool UBX_in, bool NMEA_in, bool RTC
   ubxChecksumAndSend(message,sizeof(message));
   if (verbose)
   {  
-    Serial.printf("set DDC Address to 0x%2X, in: 0x%2X (%d %d %d), out: 0x%2X (%d %d %d)\n",DDC_ADDRESS, in0,UBX_in,NMEA_in,RTCM3_in, out0,UBX_out,NMEA_out,RTCM3_out);
+    Serial.printf("set DDC Address to 0x%2X, in: 0x%2X (%d %d %d), out: 0x%2X (%d %d %d)\n",address, in0,UBX_in,NMEA_in,RTCM3_in, out0,UBX_out,NMEA_out,RTCM3_out);
   }
 }
 
@@ -108,7 +107,7 @@ void neoGPS::ubxReplaceChecksum(char *message, int mLength){
 
 void neoGPS::ubxChecksumAndSend(char *message, int mLength){
   ubxReplaceChecksum(message,mLength);
-    Wire.beginTransmission(DDC_ADDRESS);  // open DDC line
+    Wire.beginTransmission(_address);  // open DDC line
       for (int i = 0; i<mLength; i++){
         Wire.write(message[i]);
       }

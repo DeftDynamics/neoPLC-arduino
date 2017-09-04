@@ -2,16 +2,11 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-neoPWM	KEYWORD1
+neoGPS	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
-begin		KEYWORD2
-reset		KEYWORD2
-setPWMFreq	KEYWORD2
-setPWM		KEYWORD2
-analogWrite	KEYWORD2
-zeroAll		KEYWORD2
-softPWM		KEYWORD2
+begin 		KEYWORD2
+poll		KEYWORD2
+verbose 	KEYWORD2
