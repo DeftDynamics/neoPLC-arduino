@@ -2,9 +2,9 @@
   "packages": [
     {
       "name": "deftdynamics",
-      "maintainer": "Kyle Kubik",
+      "maintainer": "Deft Dynamics",
       "websiteURL": "https://github.com/DeftDynamics/neoPLC-arduino",
-      "email": "kylekubik@gmail.com",
+      "email": "admin@deftdynamics.com",
       "help": {
         "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
       },
