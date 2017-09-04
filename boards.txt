@@ -41,7 +41,7 @@ neoPLCv1.build.f_cpu=16000000
 neoPLCv1.build.board=NRF52_DK
 neoPLCv1.build.core=nRF52
 neoPLCv1.build.variant=neoPLCv1
-neoPLCv2.build.variant_system_lib=
+neoPLCv1.build.variant_system_lib=
 neoPLCv1.build.extra_flags=-DNRF52
 neoPLCv1.build.float_flags=-mfloat-abi=hard -mfpu=fpv4-sp-d16
 neoPLCv1.build.ldscript=nrf52_xxaa.ld
