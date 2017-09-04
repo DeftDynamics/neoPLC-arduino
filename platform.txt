@@ -59,7 +59,7 @@ compiler.nrf.flags=-DNRF5 "-I{nrf.sdk.path}/components/toolchain/" "-I{nrf.sdk.p
 compiler.nrf.ble.flags = "-I{nrf.sdk.path}/components/ble/ble_services/" "-I{nrf.sdk.path}/components/ble/common/" "-I{nrf.sdk.path}/components/ble/device_manager/" "-I{nrf.sdk.path}/components/ble/device_manager/config/" "-I{nrf.sdk.path}/components/ble/peer_manager/" "-I{nrf.sdk.path}/components/ble/ble_error_log/"
 compiler.nrf.drivers_nrf.flags = "-I{nrf.sdk.path}/components/drivers_nrf/ble_flash/" "-I{nrf.sdk.path}/components/drivers_nrf/hal/" "-I{nrf.sdk.path}/components/drivers_nrf/pstorage/" "-I{nrf.sdk.path}/components/drivers_nrf/pstorage/config/" "-I{nrf.sdk.path}/components/drivers_nrf/delay/" "-I{nrf.sdk.path}/components/drivers_nrf/config/"
 compiler.nrf.libraries.flags = "-I{nrf.sdk.path}/components/libraries/util/" "-I{nrf.sdk.path}/components/libraries/timer/" "-I{nrf.sdk.path}/components/libraries/trace/" "-I{nrf.sdk.path}/components/libraries/fstorage/" "-I{nrf.sdk.path}/components/libraries/fstorage/config/" "-I{nrf.sdk.path}/components/libraries/experimental_section_vars/" "-I{nrf.sdk.path}/components/libraries/fds/" "-I{nrf.sdk.path}/components/libraries/fds/config/"
-compiler.nrf.softdevice.flags = "-I{nrf.sdk.path}/components/softdevice/{softdevice}/headers/" "-I{nrf.sdk.path}/components/softdevice/common/softdevice_handler/" 
+compiler.nrf.softdevice.flags = "-I{nrf.sdk.path}/components/softdevice/s132/headers/" "-I{nrf.sdk.path}/components/softdevice/common/softdevice_handler/" 
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags=
@@ -87,7 +87,7 @@ recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU=
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} "-L{nrf.sdk.path}/components/toolchain/gcc/" "-L{nrf.sdk.path}/components/softdevice/{softdevice}/toolchain/armgcc/" "-T{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nano.specs --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--start-group -lm "{build.path}/{archive_file}" -Wl,--end-group
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} "-L{nrf.sdk.path}/components/toolchain/gcc/" "-L{nrf.sdk.path}/components/softdevice/s132/toolchain/armgcc/" "-T{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nano.specs --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--start-group -lm "{build.path}/{archive_file}" -Wl,--end-group
 
 ## Create output (bin file)
 recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2bin.cmd}" {compiler.elf2bin.flags} {compiler.elf2bin.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
