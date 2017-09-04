@@ -17,10 +17,10 @@
           "help": {
             "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
           },
-          "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/0.1.3.tar.gz",
-          "archiveFileName": "neoPLC-arduino-0.1.3.tar.gz",
-          "checksum": "MD5:e278418a72e0648a3da2c07cca580326",
-          "size": "533613",
+          "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/0.1.4.tar.gz",
+          "archiveFileName": "neoPLC-arduino-0.1.4.tar.gz",
+          "checksum": "MD5:dd812237b19c5cf2de4a56168bdc8cfb",
+          "size": "533626",
           "boards": [
             {"name": "neoPLC 1.0"}
           ],
