@@ -12,47 +12,17 @@
         {
           "name": "neoPLC Boards",
           "architecture": "nRF52",
-          "version": "0.0.0",
-          "category": "Contributed",
-          "help": {
-            "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
-          },
-          "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/0.0/neoPLC-0.0.zip",
-          "archiveFileName": "neoPLC-0.0.zip",
-          "checksum": "SHA-256:1d2c03b797edf61760c38df04c69cd47dcb7a59e4d3c5cd57fed69df2b41744a",
-          "size": "877771",
-          "boards": [
-            {"name": "neoPLC 2.0"},
-            {"name": "neoPLC 2.1"}
-          ],
-          "toolsDependencies": [
-            {
-              "packager": "deftdynamics",
-              "name": "gcc-arm-none-eabi",
-              "version": "5_2-2015q4"
-            },
-            {
-              "packager": "deftdynamics",
-              "name": "nrfutil",
-              "version": "0.0"
-            }
-          ]
-        },
-        {
-          "name": "neoPLC Boards",
-          "architecture": "nRF52",
-          "version": "0.1.0",
+          "version": "0.1",
           "category": "Contributed",
           "help": {
             "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
           },
           "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/0.1.tar.gz",
-          "archiveFileName": "neoPLC-0.1.tar.gz",
-          "checksum": "MD5:b19f2f1b51a1b253a7d9d8cbc5f75971",
+          "archiveFileName": "neoPLC-arduino-0.1.tar.gz",
+          "checksum": "MD5:4015ed0ad57b245ec7ca54dae10ab181",
           "size": "707126",
           "boards": [
-            {"name": "neoPLC 2.0"},
-            {"name": "neoPLC 2.1"}
+            {"name": "neoPLC 1.0"}
           ],
           "toolsDependencies": [
             {
