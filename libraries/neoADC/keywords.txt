@@ -14,10 +14,3 @@ read		KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-## Voltage reference Modes
-EXT 		LITERAL1
-INT 		LITERAL1
-
-## Channel ending modes
-SD			LITERAL1
-DF			LITERAL1

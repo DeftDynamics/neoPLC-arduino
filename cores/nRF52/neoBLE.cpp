@@ -1,23 +1,29 @@
-
 #include <string.h>
 #include <ble.h>
 #include <ble_hci.h>
 #include <nrf_nvic.h>
 #include <nrf_sdm.h>
 #include "variant.h"
+#include <neoNUS.h>
+
 
 #include "neoBLE.h"
+
+#define BLE_UUID_OUR_BASE_UUID  {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00} 
 
 #define DFU_REV_MAJOR                    0x00                                       /** DFU Major revision number to be exposed. */
 #define DFU_REV_MINOR                    0x01                                       /** DFU Minor revision number to be exposed. */
 #define DFU_REVISION                     ((DFU_REV_MAJOR << 8) | DFU_REV_MINOR)     /** DFU Revision number to be exposed. Combined of major and minor versions. */
-#define BLE_UUID_OUR_BASE_UUID  {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00} 
-#define MAX_DFU_PKT_LEN         20                                              /**< Maximum length (in bytes) of the DFU Packet characteristic. */
+                                              /**< Maximum length (in bytes) of the DFU Packet characteristic. */
 #define BLE_DFU_SERVICE_UUID                 0x1530                       /**< The UUID of the DFU Service. */
 #define BLE_DFU_PKT_CHAR_UUID                0x1532                       /**< The UUID of the DFU Packet Characteristic. */
 #define BLE_DFU_CTRL_PT_UUID                 0x1531                       /**< The UUID of the DFU Control Point. */
 #define BLE_DFU_STATUS_REP_UUID              0x1533                       /**< The UUID of the DFU Status Report Characteristic. */
 #define BLE_DFU_REV_CHAR_UUID                0x1534                       /**< The UUID of the DFU Revision Characteristic. */
+
+#define BLE_UUID_NUS_SERVICE            0x0001                       /**< The UUID of the Nordic UART Service. */
+#define BLE_UUID_NUS_TX_CHARACTERISTIC  0x0003                       /**< The UUID of the TX Characteristic. */
+#define BLE_UUID_NUS_RX_CHARACTERISTIC  0x0002                       /**< The UUID of the RX Characteristic. */
 
 #define BLE_STACK_EVT_MSG_BUF_SIZE  (sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT))
 #define SOFTDEVICE_EVT_IRQ        	SD_EVT_IRQn       /**< SoftDevice Event IRQ number. Used for both protocol events and SoC events. */
@@ -35,6 +41,7 @@ extern "C"{
 #ifdef __cplusplus
 }
 #endif
+
 enum
 {
     OP_CODE_START_DFU          = 1,                                             /**< Value of the Op code field for 'Start DFU' command.*/
@@ -53,61 +60,125 @@ neoBLE::neoBLE(){
 	
 }
 
+void neoBLE::begin(){
+	_txCount = 0;
+  	_rxHead = _rxTail = 0;
+
+	init();
+
+	ble_uuid_t base_uuid;
+	const ble_uuid128_t NUS_UUID ={ { 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E } };
+    sd_ble_uuid_vs_add(&NUS_UUID, &(base_uuid.type));
+	_service_handle = uart_service_add(base_uuid.type);
+	uart_desc_add(base_uuid.type,_service_handle,"UART");
+	_rx_handle = uart_rx_char_add(base_uuid.type,_service_handle);
+	uart_desc_add(base_uuid.type,_rx_handle,"RX - Receive Data (Write)");
+	_tx_handle = uart_tx_char_add(base_uuid.type,_service_handle);
+	uart_desc_add(base_uuid.type,_tx_handle,"TX - Transfer Data (Notify)");
+
+	//OR
+	
+	const ble_uuid128_t NUS_UUID ={ { 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E } };
+	neoBLE_service nus_service = add_service(NUS_UUID,BLE_UUID_NUS_SERVICE);
+	neoBLE_characteristic rx_char = nus_service.add_characteristic(BLE_UUID_NUS_RX_CHARACTERISTIC, BLEWrite, "RX - Receive Data (Write)", 0xFF);
+	neoBLE_characteristic tx_char = nus_service.add_characteristic(BLE_UUID_NUS_TX_CHARACTERISTIC, BLENotify, "TX - Transfer Data (Notify)", 0xFF);
+
+	ble_dfu_init();
+	
+	start_advertizing();
+}
+
+bool neoBLE::connected(){
+	if(_conn_handle==0) return false;
+	return true;
+}
+
+int neoBLE::available(void) {
+  int retval = (_rxHead - _rxTail + sizeof(_rxBuffer)) % sizeof(_rxBuffer);
+  return retval;
+}
+
+int neoBLE::peek(void) {
+  if (_rxTail == _rxHead) return -1;
+  uint8_t byte = _rxBuffer[_rxTail];
+  return byte;
+}
+
+int neoBLE::read(void) {
+  if (_rxTail == _rxHead) return -1;
+  _rxTail = (_rxTail + 1) % sizeof(_rxBuffer);
+  uint8_t byte = _rxBuffer[_rxTail];
+  return byte;
+}
+
+void neoBLE::flush(void) {
+  if (_txCount == 0) return;
+  set_value(_tx_handle, _txBuffer, _txCount);
+  _txCount = 0;
+}
+
+uint16_t neoBLE::write(uint8_t byte) {
+  //if (_txCharacteristic.subscribed() == false) return 0;
+  _txBuffer[_txCount++] = byte;
+  if (_txCount == sizeof(_txBuffer)) flush();
+  return 1;
+}
+
+void neoBLE::_received(const uint8_t* data, uint16_t size) {
+  for (int i = 0; i < size; i++) {
+    _rxHead = (_rxHead + 1) % sizeof(_rxBuffer);
+    _rxBuffer[_rxHead] = data[i];
+  }
+}
+
 void neoBLE::event_handler(ble_evt_t * p_ble_evt){
 	switch (p_ble_evt->header.evt_id){
 		case BLE_GAP_EVT_CONNECTED:
-			conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-			break;
+			_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+		break;
+		case BLE_GAP_EVT_DISCONNECTED:
+			_conn_handle = 0;
+			start_advertizing();
+		break;
 		case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
-		ble_gatts_evt_rw_authorize_request_t * p_authorize_request;
+			ble_gatts_evt_rw_authorize_request_t * p_authorize_request;
+			p_authorize_request = &(p_ble_evt->evt.gatts_evt.params.authorize_request);
+			if ((p_authorize_request->type == BLE_GATTS_AUTHORIZE_TYPE_WRITE)&&
+				(p_ble_evt->evt.gatts_evt.params.authorize_request.request.write.op != BLE_GATTS_OP_PREP_WRITE_REQ)&&
+				(p_ble_evt->evt.gatts_evt.params.authorize_request.request.write.op != BLE_GATTS_OP_EXEC_WRITE_REQ_NOW)&&
+				(p_ble_evt->evt.gatts_evt.params.authorize_request.request.write.op != BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL)){
+				
+				ble_gatts_evt_write_t * p_ble_write_evt = &(p_authorize_request->request.write);
+				ble_gatts_rw_authorize_reply_params_t auth_reply;
 
-		p_authorize_request = &(p_ble_evt->evt.gatts_evt.params.authorize_request);
-		if ((p_authorize_request->type == BLE_GATTS_AUTHORIZE_TYPE_WRITE)&&
-			(p_ble_evt->evt.gatts_evt.params.authorize_request.request.write.op != BLE_GATTS_OP_PREP_WRITE_REQ)&&
-			(p_ble_evt->evt.gatts_evt.params.authorize_request.request.write.op != BLE_GATTS_OP_EXEC_WRITE_REQ_NOW)&&
-			(p_ble_evt->evt.gatts_evt.params.authorize_request.request.write.op != BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL)){
-			
-			ble_gatts_evt_write_t * p_ble_write_evt = &(p_authorize_request->request.write);
-			ble_gatts_rw_authorize_reply_params_t auth_reply;
+				auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+				auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
+				auth_reply.params.write.update = 1;
+				auth_reply.params.write.offset = p_ble_write_evt->offset;
+				auth_reply.params.write.len = p_ble_write_evt->len;
+				auth_reply.params.write.p_data = p_ble_write_evt->data;
+				auth_reply.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
 
-			auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
-			auth_reply.type = BLE_GATTS_AUTHORIZE_TYPE_WRITE;
-			auth_reply.params.write.update = 1;
-			auth_reply.params.write.offset = p_ble_write_evt->offset;
-			auth_reply.params.write.len = p_ble_write_evt->len;
-			auth_reply.params.write.p_data = p_ble_write_evt->data;
-
-			auth_reply.params.write.gatt_status = BLE_GATT_STATUS_SUCCESS;
-
-			sd_ble_gatts_rw_authorize_reply(conn_handle, &auth_reply);
-			switch (p_ble_write_evt->data[0]){
-				case OP_CODE_START_DFU:
-						//BOOTLOADER START
-						//bootload_ble(); //<- this goes back to variant.cpp
-						//NRF_POWER->GPREGRET = BOOTLOADER_DFU_START_BLE;
+				sd_ble_gatts_rw_authorize_reply(_conn_handle, &auth_reply);
+				switch (p_ble_write_evt->data[0]){
+					case OP_CODE_START_DFU:
 						sd_power_gpregret_set(BOOTLOADER_DFU_START_BLE);
 						sd_softdevice_disable();
-						/*sd_softdevice_vector_table_base_set(NRF_UICR->NRFFW[0]);
-						NVIC_ClearPendingIRQ(SWI2_IRQn);
-						// Fetch the current interrupt settings.
-						interrupt_setting_mask = NVIC->ISER[0];
-						for (uint32_t irq = 0; irq < MAX_NUMBER_INTERRUPTS; irq++)
-						{
-							if (interrupt_setting_mask & (IRQ_ENABLED << irq))
-							{
-								// The interrupt was enabled, and hence disable it.
-								NVIC_DisableIRQ((IRQn_Type)irq);
-							}
-						}*/
 						NVIC_SystemReset();
-				break;
+					break;
+				}
 			}
 		break;
-		}
+		case BLE_GATTS_EVT_WRITE: 
+        	uint16_t handle = p_ble_evt->evt.gatts_evt.params.write.handle;
+          	if (_rx_handle == handle) {
+          		_received(p_ble_evt->evt.gatts_evt.params.write.data, p_ble_evt->evt.gatts_evt.params.write.len);
+        	}
+        break;
 	}
 }
 
-void neoBLE::begin(){
+void neoBLE::init(){
 	//set clock source
 	#if defined(USE_LFRC)
     nrf_clock_lf_cfg_t cfg = {
@@ -158,10 +229,39 @@ void neoBLE::begin(){
 	gap_conn_params.conn_sup_timeout  = 4000 / 10; // in 10ms unit
 	sd_ble_gap_ppcp_set(&gap_conn_params);
 	sd_ble_gap_tx_power_set(0);
-	
-	ble_dfu_init();
 }
 
+void neoBLE::start_advertizing(){
+	ble_gap_adv_params_t advertisingParameters;
+
+	memset(&advertisingParameters, 0x00, sizeof(advertisingParameters));
+
+	advertisingParameters.type        = BLE_GAP_ADV_TYPE_ADV_IND;
+	advertisingParameters.p_peer_addr = NULL;
+	advertisingParameters.fp          = BLE_GAP_ADV_FP_ANY;
+	advertisingParameters.p_whitelist = NULL;
+	advertisingParameters.interval    = 300;//(10 * 16) / 10; // advertising interval (in units of 0.625 ms)
+	advertisingParameters.timeout     = 0;
+
+	sd_ble_gap_adv_start(&advertisingParameters);
+}
+
+neoBLE_service neoBLE::add_service(ble_uuid128_t base_uuid, uint16_t uuid){
+	ble_uuid_t      	service_uuid;
+	service_uuid.uuid 	= uuid;
+	sd_ble_uuid_vs_add(&base_uuid, &service_uuid.type);  
+
+	uint16_t		service_handle;
+	sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &service_uuid, &service_handle);
+	return neoBLE_service(service_handle,service_uuid.type);
+}
+neoBLE_service neoBLE::add_service(uint16_t uuid){
+	ble_uuid128_t   	base_uuid = BLE_UUID_OUR_BASE_UUID;
+	return add_service(base_uuid,uuid);
+}
+
+//UNUSED FOR NOW
+/*
 uint16_t neoBLE::add_service(uint16_t uuid){
 	ble_uuid_t      	service_uuid;
 	ble_uuid128_t   	base_uuid = BLE_UUID_OUR_BASE_UUID;
@@ -190,10 +290,9 @@ uint16_t neoBLE::add_characteristic(uint16_t service_handle, uint16_t uuid, uint
 	memset(&attr_char_value, 0, sizeof(attr_char_value));    
 	attr_char_value.p_uuid      = &char_uuid;
 	attr_char_value.p_attr_md   = &attr_md;
-	attr_char_value.max_len     = 20;
-	attr_char_value.init_len    = 20;
-	uint8_t value[20]            = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-	attr_char_value.p_value     = value;
+    attr_char_value.init_len  = sizeof(uint8_t);
+    attr_char_value.init_offs = 0;
+    attr_char_value.max_len   = BLE_ATTRIBUTE_MAX_VALUE_LENGTH;
 	
 	//characteristic metadata
 	ble_gatts_char_md_t 				char_md;
@@ -305,20 +404,31 @@ uint16_t neoBLE::add_descriptor(uint16_t char_handle, uint16_t uuid, const char*
 	sd_ble_gatts_descriptor_add(char_handle, &desc_attr, &desc_handle);
 	return desc_handle;
 }
+*/
 
-void neoBLE::start_advertizing(){
-	ble_gap_adv_params_t advertisingParameters;
+neoBLE BLE;
 
-	memset(&advertisingParameters, 0x00, sizeof(advertisingParameters));
-
-	advertisingParameters.type        = BLE_GAP_ADV_TYPE_ADV_IND;
-	advertisingParameters.p_peer_addr = NULL;
-	advertisingParameters.fp          = BLE_GAP_ADV_FP_ANY;
-	advertisingParameters.p_whitelist = NULL;
-	advertisingParameters.interval    = 300;//(10 * 16) / 10; // advertising interval (in units of 0.625 ms)
-	advertisingParameters.timeout     = 0;
-
-	sd_ble_gap_adv_start(&advertisingParameters);
+void SOFTDEVICE_EVT_IRQHandler(){
+    bool no_more_ble_evts = false;
+    for (;;){
+        uint32_t err_code;
+        // Fetch BLE Events.
+        if (!no_more_ble_evts){
+            // Pull event from stack
+            uint16_t evt_len = m_ble_evt_buffer_size;
+            err_code = sd_ble_evt_get(mp_ble_evt_buffer, &evt_len);
+            if (err_code == NRF_ERROR_NOT_FOUND){
+                no_more_ble_evts = true;
+            }else if (err_code != NRF_SUCCESS){
+                //APP_ERROR_HANDLER(err_code);
+            }else{
+                // Call application's BLE stack event handler.
+                BLE.event_handler((ble_evt_t *)mp_ble_evt_buffer);
+            }
+        }else{
+			break;
+		}
+    }
 }
 
 void ble_dfu_init(){
@@ -343,6 +453,7 @@ void ble_dfu_init(){
     dfu_ctrl_pt_add(service_uuid.type, service_handle);
     dfu_rev_char_add(service_uuid.type, service_handle, DFU_REVISION);
 }
+
 static uint32_t dfu_pkt_char_add(uint8_t uuid_type, uint16_t service_handle)
 {
     ble_gatts_char_md_t char_md;
@@ -387,6 +498,7 @@ static uint32_t dfu_pkt_char_add(uint8_t uuid_type, uint16_t service_handle)
                                            &attr_char_value,
                                            &dfu_pkt_handles);
 }
+
 static uint32_t dfu_rev_char_add(uint8_t uuid_type, uint16_t service_handle, uint16_t const revision)
 {
     ble_gatts_char_md_t char_md;
@@ -431,6 +543,7 @@ static uint32_t dfu_rev_char_add(uint8_t uuid_type, uint16_t service_handle, uin
                                            &attr_char_value,
                                            &dfu_rev_handles);
 }
+
 static uint32_t dfu_ctrl_pt_add(uint8_t uuid_type, uint16_t service_handle)
 {
     ble_gatts_char_md_t char_md;
@@ -475,29 +588,4 @@ static uint32_t dfu_ctrl_pt_add(uint8_t uuid_type, uint16_t service_handle)
                                            &char_md,
                                            &attr_char_value,
                                            &dfu_ctrl_pt_handles);
-}
-
-neoBLE BLE;
-
-void SOFTDEVICE_EVT_IRQHandler(){
-    bool no_more_ble_evts = false;
-    for (;;){
-        uint32_t err_code;
-        // Fetch BLE Events.
-        if (!no_more_ble_evts){
-            // Pull event from stack
-            uint16_t evt_len = m_ble_evt_buffer_size;
-            err_code = sd_ble_evt_get(mp_ble_evt_buffer, &evt_len);
-            if (err_code == NRF_ERROR_NOT_FOUND){
-                no_more_ble_evts = true;
-            }else if (err_code != NRF_SUCCESS){
-                //APP_ERROR_HANDLER(err_code);
-            }else{
-                // Call application's BLE stack event handler.
-                BLE.event_handler((ble_evt_t *)mp_ble_evt_buffer);
-            }
-        }else{
-			break;
-		}
-    }
 }

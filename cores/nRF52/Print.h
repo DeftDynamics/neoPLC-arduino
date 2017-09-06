@@ -21,6 +21,7 @@
 
 #include <inttypes.h>
 #include <stdio.h> // for size_t
+#include <stdarg.h>
 
 #include "WString.h"
 #include "Printable.h"
@@ -78,6 +79,38 @@ class Print
     size_t println(double, int = 2);
     size_t println(const Printable&);
     size_t println(void);
+    
+#define PRINTF_BUF 128 // define the tmp buffer size (change if desired)
+    void printf(const char *format, ...)
+    {
+        char buf[PRINTF_BUF];
+        va_list ap;
+        va_start(ap, format);
+        vsnprintf(buf, sizeof(buf), format, ap);
+        for(char *p = &buf[0]; *p; p++)
+        {
+            if(*p == '\n')
+                write('\r');
+            write(*p);
+        }
+        va_end(ap);
+    }
+#ifdef F // check to see if F() macro is available
+    void printf(const __FlashStringHelper *format, ...)
+    {
+        char buf[PRINTF_BUF];
+        va_list ap;
+        va_start(ap, format);
+        vsnprintf(buf, sizeof(buf), (const char *)format, ap);
+        for(char *p = &buf[0]; *p; p++)
+        {
+            if(*p == '\n')
+                write('\r');
+            write(*p);
+        }
+        va_end(ap);
+    }
+#endif
 };
 
 #endif

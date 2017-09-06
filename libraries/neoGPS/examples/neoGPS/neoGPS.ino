@@ -26,7 +26,7 @@ void setup() {
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
   
-  delay(1000);
+  delay(2000);
   Serial.print("neoGPS test\n");
 
   gps.verbose = false;
@@ -72,7 +72,7 @@ void regulateLoop(float dt)
 }
 
 void printPVT(){
-  /*
+  
      Serial.printf("PVT flags\n");
      Serial.printf(" > Date = %d | Time = %d | Rslv = %d\n",gps.pvt.validDate,gps.pvt.validTime,gps.pvt.fullyResolved);
      Serial.printf(" >  PSM = %d |  Mag = %d | Hdng = %d\n",gps.pvt.psmState,gps.pvt.validMag,gps.pvt.headVehValid);
@@ -105,8 +105,10 @@ void printPVT(){
      
      Serial.printf(" >  magDec = %1.3f deg\n",gps.pvt.magDec);
      Serial.printf(" >  magAcc = %1.3f deg\n\n",gps.pvt.magAcc);
-     */
      
+
+     // use this if your microcontroller doesn't support 'Serial.printf'
+     /*
      Serial.print("Fix = ");
      Serial.println(gps.pvt.fixType);
      
@@ -117,12 +119,13 @@ void printPVT(){
      Serial.print(" >     lon = ");
      Serial.print(gps.pvt.lon,7);
      Serial.print(" deg\n\n");
+     */
      
 }
 
 
 void printSAT(){
-/*
+
      Serial.printf("SAT data\n");
      Serial.printf(" >    numSVs = %d",gps.sat.numSVs);
 
@@ -154,6 +157,6 @@ void printSAT(){
        Serial.printf(" >    elev = %2d |  azim = %d\n",gps.sat.svData[sv].elev,gps.sat.svData[sv].azim);
        Serial.printf(" > quality = %2d |  used = %d\n\n",gps.sat.svData[sv].quality,gps.sat.svData[sv].svUsed);
      }
-     */
+     
 }
 

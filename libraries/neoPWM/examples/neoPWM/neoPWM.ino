@@ -13,7 +13,7 @@ void setup()
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
   
-  delay(1000);
+  delay(2000);
   Serial.println("neoPWM Test");
 
   pwm.begin(1600); // maximum frequency is 1600 Hz

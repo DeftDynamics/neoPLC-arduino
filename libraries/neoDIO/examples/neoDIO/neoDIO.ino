@@ -13,6 +13,7 @@ int mode = 1; // mode = 0 is input test  - test by connecting buttons or switche
 
 void setup() {  
   pinMode(LED_BUILTIN, OUTPUT);
+  delay(2000);
   Serial.println("neoDIO test");
   
   dio.begin();

@@ -11,8 +11,10 @@ bool led_state = true;
 void setup() {
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
-  
+
+  delay(2000);
   Serial.println("neoPLC-ENV test...");
+  
   bool success = env.begin();
   if (success) {
     Serial.println("Successfully connected\n");

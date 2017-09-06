@@ -17,6 +17,7 @@ void setup()
 
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
+  delay(2000);
   
     /* potential values for setup:
   Accelerometer Range:
