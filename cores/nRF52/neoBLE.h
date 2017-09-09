@@ -1,6 +1,7 @@
 #ifndef _NEOBLE_H_
 #define _NEOBLE_H_
 
+#include <Arduino.h>
 #include <string.h>
 #include <ble.h>
 #include <ble_hci.h>
@@ -11,6 +12,8 @@
 
 #define BLE_ATTRIBUTE_MAX_VALUE_LENGTH 20
 #define MAX_DFU_PKT_LEN         20
+#define BLE_CONN_HANDLE_INVALID 0xFFFF
+#define BLE_UUID_OUR_BASE_UUID  {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00} 
 
 enum BLEProperty {
   BLEBroadcast            = 0x01,
@@ -21,44 +24,42 @@ enum BLEProperty {
   BLEIndicate             = 0x20
 };
 
-class neoBLE{
+class neoBLE : public Stream{
 	public:
 		neoBLE();
 		void event_handler(ble_evt_t * p_ble_evt);
 		void begin();
 		void init();
+		void setDeviceName(const char* device_name);
+		void start_advertizing();
+		
 		bool connected();
 		int available();
 		int peek();
 		int read();
 		void flush();
-		uint16_t write(uint8_t byte);
+		size_t write(uint8_t byte);
+		using Print::write;
 
-		neoBLE_service add_service(ble_uuid128_t base_uuid, uint16_t uuid);
-		neoBLE_service add_service(uint16_t uuid);
-		/*uint16_t add_service(uint16_t uuid);
-		uint16_t add_characteristic(uint16_t service_handle, uint16_t uuid, uint8_t properties, const char* str_description, uint8_t format);
-		uint16_t add_characteristic(uint16_t service_handle, uint16_t uuid);
-		void set_value(uint16_t value_handle, const uint8_t value[], uint8_t length);
-		void set_value(uint16_t value_handle, const char* value);
-		void set_value(uint16_t value_handle, int value);
-		uint16_t add_descriptor(uint16_t char_handle, uint16_t uuid, const char* attr_value);
-		*/
-		void start_advertizing();
+		neoBLE_service* add_service(ble_uuid128_t base_uuid, uint16_t uuid);
+		neoBLE_service* add_service(uint16_t uuid);
 		
 	private:
-		uint16_t _conn_handle=0;
+		uint16_t _conn_handle=BLE_CONN_HANDLE_INVALID;
 		uint16_t _service_handle;
-		uint16_t _rx_handle;
-		uint16_t _tx_handle;
+		uint16_t _rx_handle=5;
+		uint16_t _tx_handle=5;
+		neoBLE_service* _nus_service;
+		neoBLE_characteristic* _rx_char;
+		neoBLE_characteristic* _tx_char;
 		
 		void _received(const uint8_t* data, uint16_t size);
 
-		size_t _rxHead;
-    	size_t _rxTail;
-    	size_t _rxCount() const;
+		uint16_t _rxHead;
+    	uint16_t _rxTail;
+    	uint16_t _rxCount() const;
     	uint8_t _rxBuffer[BLE_ATTRIBUTE_MAX_VALUE_LENGTH];
-    	size_t _txCount;
+    	uint16_t _txCount;
     	uint8_t _txBuffer[BLE_ATTRIBUTE_MAX_VALUE_LENGTH];
 		
 };

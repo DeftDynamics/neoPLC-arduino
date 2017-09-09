@@ -1,15 +1,15 @@
+#include <Arduino.h>
+
 #include <string.h>
 #include <ble.h>
 #include <ble_hci.h>
 #include <nrf_nvic.h>
 #include <nrf_sdm.h>
+#include <dfu_ble_svc.h>
 #include "variant.h"
-#include <neoNUS.h>
-
 
 #include "neoBLE.h"
 
-#define BLE_UUID_OUR_BASE_UUID  {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00} 
 
 #define DFU_REV_MAJOR                    0x00                                       /** DFU Major revision number to be exposed. */
 #define DFU_REV_MINOR                    0x01                                       /** DFU Minor revision number to be exposed. */
@@ -33,7 +33,7 @@ static uint8_t                      * mp_ble_evt_buffer = (uint8_t *)BLE_EVT_BUF
 static uint16_t                     m_ble_evt_buffer_size = sizeof(BLE_EVT_BUFFER);            /**< Size of BLE event buffer. */
 //static ble_evt_handler_t            m_ble_evt_handler;
 
-nrf_nvic_state_t nrf_nvic_state;
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -65,31 +65,26 @@ void neoBLE::begin(){
   	_rxHead = _rxTail = 0;
 
 	init();
-
-	ble_uuid_t base_uuid;
-	const ble_uuid128_t NUS_UUID ={ { 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E } };
-    sd_ble_uuid_vs_add(&NUS_UUID, &(base_uuid.type));
-	_service_handle = uart_service_add(base_uuid.type);
-	uart_desc_add(base_uuid.type,_service_handle,"UART");
-	_rx_handle = uart_rx_char_add(base_uuid.type,_service_handle);
-	uart_desc_add(base_uuid.type,_rx_handle,"RX - Receive Data (Write)");
-	_tx_handle = uart_tx_char_add(base_uuid.type,_service_handle);
-	uart_desc_add(base_uuid.type,_tx_handle,"TX - Transfer Data (Notify)");
-
-	//OR
 	
 	const ble_uuid128_t NUS_UUID ={ { 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E } };
-	neoBLE_service nus_service = add_service(NUS_UUID,BLE_UUID_NUS_SERVICE);
-	neoBLE_characteristic rx_char = nus_service.add_characteristic(BLE_UUID_NUS_RX_CHARACTERISTIC, BLEWrite, "RX - Receive Data (Write)", 0xFF);
-	neoBLE_characteristic tx_char = nus_service.add_characteristic(BLE_UUID_NUS_TX_CHARACTERISTIC, BLENotify, "TX - Transfer Data (Notify)", 0xFF);
+	_nus_service = add_service(NUS_UUID,BLE_UUID_NUS_SERVICE);
+	_nus_service->add_descriptor(0x2901,"UART");
+	_rx_char = _nus_service->add_characteristic(BLE_UUID_NUS_RX_CHARACTERISTIC, BLENotify, "", 0xFF);
+	_tx_char = _nus_service->add_characteristic(BLE_UUID_NUS_TX_CHARACTERISTIC, BLEWrite|BLEWriteWithoutResponse, "", 0xFF);
 
 	ble_dfu_init();
 	
 	start_advertizing();
 }
 
+void neoBLE::setDeviceName(const char* device_name){
+	ble_gap_conn_sec_mode_t sec_mode;
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+    sd_ble_gap_device_name_set(&sec_mode,(const uint8_t *)device_name,strlen(device_name));
+}
+
 bool neoBLE::connected(){
-	if(_conn_handle==0) return false;
+	if(_conn_handle==BLE_CONN_HANDLE_INVALID) return false;
 	return true;
 }
 
@@ -113,22 +108,32 @@ int neoBLE::read(void) {
 
 void neoBLE::flush(void) {
   if (_txCount == 0) return;
-  set_value(_tx_handle, _txBuffer, _txCount);
+	ble_gatts_hvx_params_t hvx_params;
+	memset(&hvx_params, 0, sizeof(hvx_params));
+    hvx_params.handle = _rx_char->get_value_handle();
+    hvx_params.p_data = _txBuffer;
+    hvx_params.p_len  = &_txCount;
+    hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
+    sd_ble_gatts_hvx(_conn_handle, &hvx_params);
   _txCount = 0;
 }
 
-uint16_t neoBLE::write(uint8_t byte) {
+size_t neoBLE::write(uint8_t byte) {
+	//Serial.println("write");
   //if (_txCharacteristic.subscribed() == false) return 0;
   _txBuffer[_txCount++] = byte;
+  //Serial.println(_txCount);
   if (_txCount == sizeof(_txBuffer)) flush();
   return 1;
 }
 
 void neoBLE::_received(const uint8_t* data, uint16_t size) {
+  //Serial.println("_recieved");
   for (int i = 0; i < size; i++) {
     _rxHead = (_rxHead + 1) % sizeof(_rxBuffer);
     _rxBuffer[_rxHead] = data[i];
   }
+  
 }
 
 void neoBLE::event_handler(ble_evt_t * p_ble_evt){
@@ -137,9 +142,15 @@ void neoBLE::event_handler(ble_evt_t * p_ble_evt){
 			_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 		break;
 		case BLE_GAP_EVT_DISCONNECTED:
-			_conn_handle = 0;
+			_conn_handle = BLE_CONN_HANDLE_INVALID;
 			start_advertizing();
 		break;
+		case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
+            sd_ble_gap_sec_params_reply(_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
+        break;
+        case BLE_GATTS_EVT_SYS_ATTR_MISSING:
+            sd_ble_gatts_sys_attr_set(_conn_handle, NULL, 0, 0);
+        break;
 		case BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST:
 			ble_gatts_evt_rw_authorize_request_t * p_authorize_request;
 			p_authorize_request = &(p_ble_evt->evt.gatts_evt.params.authorize_request);
@@ -162,19 +173,21 @@ void neoBLE::event_handler(ble_evt_t * p_ble_evt){
 				sd_ble_gatts_rw_authorize_reply(_conn_handle, &auth_reply);
 				switch (p_ble_write_evt->data[0]){
 					case OP_CODE_START_DFU:
-						sd_power_gpregret_set(BOOTLOADER_DFU_START_BLE);
 						sd_softdevice_disable();
-						NVIC_SystemReset();
+						sd_softdevice_vector_table_base_set(NRF_UICR->NRFFW[0]);
+						dfu_ble_svc_boot_ble();
 					break;
 				}
 			}
 		break;
 		case BLE_GATTS_EVT_WRITE: 
         	uint16_t handle = p_ble_evt->evt.gatts_evt.params.write.handle;
-          	if (_rx_handle == handle) {
+			if (_tx_char->get_value_handle() == handle) {
+				
           		_received(p_ble_evt->evt.gatts_evt.params.write.data, p_ble_evt->evt.gatts_evt.params.write.len);
         	}
         break;
+		
 	}
 }
 
@@ -246,165 +259,20 @@ void neoBLE::start_advertizing(){
 	sd_ble_gap_adv_start(&advertisingParameters);
 }
 
-neoBLE_service neoBLE::add_service(ble_uuid128_t base_uuid, uint16_t uuid){
+neoBLE_service* neoBLE::add_service(ble_uuid128_t base_uuid, uint16_t uuid){
 	ble_uuid_t      	service_uuid;
 	service_uuid.uuid 	= uuid;
 	sd_ble_uuid_vs_add(&base_uuid, &service_uuid.type);  
 
 	uint16_t		service_handle;
 	sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &service_uuid, &service_handle);
-	return neoBLE_service(service_handle,service_uuid.type);
+	return new neoBLE_service(service_handle,service_uuid.type);
 }
-neoBLE_service neoBLE::add_service(uint16_t uuid){
+
+neoBLE_service* neoBLE::add_service(uint16_t uuid){
 	ble_uuid128_t   	base_uuid = BLE_UUID_OUR_BASE_UUID;
 	return add_service(base_uuid,uuid);
 }
-
-//UNUSED FOR NOW
-/*
-uint16_t neoBLE::add_service(uint16_t uuid){
-	ble_uuid_t      	service_uuid;
-	ble_uuid128_t   	base_uuid = BLE_UUID_OUR_BASE_UUID;
-	service_uuid.uuid 	= uuid;
-	sd_ble_uuid_vs_add(&base_uuid, &service_uuid.type);  
-	
-	uint16_t		service_handle;
-	sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &service_uuid, &service_handle);
-	return service_handle;
-}
-
-uint16_t neoBLE::add_characteristic(uint16_t service_handle, uint16_t uuid, uint8_t properties, const char* str_description, uint8_t format){
-	//UUID
-	ble_uuid_t      	char_uuid;
-	ble_uuid128_t   	base_uuid = BLE_UUID_OUR_BASE_UUID;
-	char_uuid.uuid      = uuid;
-	sd_ble_uuid_vs_add(&base_uuid, &char_uuid.type);
-	
-	//attribute metadata
-	ble_gatts_attr_md_t 	attr_md;
-	memset(&attr_md, 0, sizeof(attr_md));
-	attr_md.vloc        	= BLE_GATTS_VLOC_STACK;
-	
-	//value attribute
-	ble_gatts_attr_t    		attr_char_value;
-	memset(&attr_char_value, 0, sizeof(attr_char_value));    
-	attr_char_value.p_uuid      = &char_uuid;
-	attr_char_value.p_attr_md   = &attr_md;
-    attr_char_value.init_len  = sizeof(uint8_t);
-    attr_char_value.init_offs = 0;
-    attr_char_value.max_len   = BLE_ATTRIBUTE_MAX_VALUE_LENGTH;
-	
-	//characteristic metadata
-	ble_gatts_char_md_t 				char_md;
-	memset(&char_md, 0, sizeof(char_md));
-	if(properties & BLEBroadcast){
-		char_md.char_props.broadcast 		= 1;
-	}
-	if(properties & BLERead){
-		char_md.char_props.read 			= 1;
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
-	}
-	if(properties & BLEWriteWithoutResponse){
-		char_md.char_props.write_wo_resp 	= 1;
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
-	}
-	if(properties & BLEWrite){
-		char_md.char_props.write 			= 1;
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
-	}
-	if(properties & BLENotify){
-		char_md.char_props.notify 			= 1;
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
-	}
-	if(properties & BLEIndicate){
-		char_md.char_props.indicate 		= 1;
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
-	}
-	char_md.char_props.auth_signed_wr 		= 0;
-	
-	//if cccd
-	if(properties & (BLENotify | BLEIndicate)){
-		ble_gatts_attr_md_t 		cccd_md;
-		memset(&cccd_md, 0, sizeof(cccd_md));
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
-		cccd_md.vloc            	= BLE_GATTS_VLOC_STACK; 
-		char_md.p_cccd_md           = &cccd_md;
-		char_md.char_props.notify   = 1;
-	}
-	//user_desc
-	uint16_t desc_len = strlen(str_description);
-	if(desc_len>0){
-		ble_gatts_attr_md_t				user_desc_md;
-		memset(&user_desc_md, 0, sizeof(user_desc_md));
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&user_desc_md.read_perm);
-		BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&user_desc_md.write_perm);
-		user_desc_md.vloc           	= BLE_GATTS_VLOC_STACK;  
-		char_md.p_user_desc_md 			= &user_desc_md;
-		char_md.p_char_user_desc		= (unsigned char*)str_description;
-		char_md.char_user_desc_max_size = desc_len;
-		char_md.char_user_desc_size		= desc_len;
-	}
-	//presentation format
-	if(format < 0x1C){
-		ble_gatts_char_pf_t 			presentation_format;
-		presentation_format.format 		= format;
-		char_md.p_char_pf 				= &presentation_format;
-	}
-	
-	//add to gatts
-	ble_gatts_char_handles_t 	char_handles;
-	sd_ble_gatts_characteristic_add(service_handle,&char_md,&attr_char_value,&char_handles);
-	return char_handles.value_handle;
-}
-
-uint16_t neoBLE::add_characteristic(uint16_t service_handle, uint16_t uuid){
-	return add_characteristic(service_handle, uuid, BLERead | BLEWrite, "", 0xFF);
-}
-
-void neoBLE::set_value(uint16_t value_handle, const uint8_t value[], uint8_t length){
-	ble_gatts_value_t new_value;
-	new_value.len = length;
-	new_value.offset = 0;
-	new_value.p_value = (uint8_t*)value;
-	sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID, value_handle, &new_value);
-}
-void neoBLE::set_value(uint16_t value_handle, const char* value){
-	set_value(value_handle,(const uint8_t*) value, strlen(value));
-}
-void neoBLE::set_value(uint16_t value_handle, int value){
-	set_value(value_handle,(const uint8_t*) &value, sizeof(int));
-}
-
-uint16_t neoBLE::add_descriptor(uint16_t char_handle, uint16_t uuid, const char* attr_value){
-	//UUID
-	ble_uuid_t      desc_uuid;
-	ble_uuid128_t   base_uuid = BLE_UUID_OUR_BASE_UUID;
-	desc_uuid.uuid = uuid;
-	sd_ble_uuid_vs_add(&base_uuid, &desc_uuid.type);
-	
-	
-	ble_gatts_attr_md_t desc_md;
-	memset(&desc_md, 0, sizeof(desc_md));
-	desc_md.vloc = BLE_GATTS_VLOC_STACK;
-	desc_md.vlen = 0;
-	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&desc_md.read_perm);
-	BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&desc_md.write_perm);
-	
-	ble_gatts_attr_t desc_attr;
-	memset(&desc_attr, 0, sizeof(desc_attr));
-	desc_attr.init_len = strlen(attr_value);
-	desc_attr.max_len = strlen(attr_value);
-	desc_attr.init_offs = 0;
-	desc_attr.p_value = (uint8_t*)attr_value;
-	desc_attr.p_uuid = &desc_uuid;
-	desc_attr.p_attr_md = &desc_md;
-	
-	uint16_t		desc_handle;
-	sd_ble_gatts_descriptor_add(char_handle, &desc_attr, &desc_handle);
-	return desc_handle;
-}
-*/
 
 neoBLE BLE;
 

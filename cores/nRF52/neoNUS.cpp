@@ -8,8 +8,8 @@
 #include "neoNUS.h"
 
 #define BLE_UUID_NUS_SERVICE            0x0001                       /**< The UUID of the Nordic UART Service. */
-#define BLE_UUID_NUS_TX_CHARACTERISTIC  0x0003                       /**< The UUID of the TX Characteristic. */
-#define BLE_UUID_NUS_RX_CHARACTERISTIC  0x0002                       /**< The UUID of the RX Characteristic. */
+#define BLE_UUID_NUS_TX_CHARACTERISTIC  0x0002                       /**< The UUID of the TX Characteristic. */
+#define BLE_UUID_NUS_RX_CHARACTERISTIC  0x0003                       /**< The UUID of the RX Characteristic. */
 #define BLE_ATTRIBUTE_MAX_VALUE_LENGTH 20
 
 uint16_t uart_service_add(uint8_t uuid_type){
@@ -79,7 +79,7 @@ uint16_t uart_rx_char_add(uint8_t uuid_type, uint16_t service_handle){
     attr_char_value.init_offs = 0;
     attr_char_value.max_len   = BLE_ATTRIBUTE_MAX_VALUE_LENGTH;
     ble_gatts_char_handles_t char_handles;
-    return sd_ble_gatts_characteristic_add(service_handle,
+    sd_ble_gatts_characteristic_add(service_handle,
                                            &char_md,
                                            &attr_char_value,
                                            &char_handles);
@@ -87,20 +87,16 @@ uint16_t uart_rx_char_add(uint8_t uuid_type, uint16_t service_handle){
 }
 uint16_t uart_tx_char_add(uint8_t uuid_type, uint16_t service_handle){
     ble_gatts_char_md_t char_md;
-    ble_gatts_attr_md_t cccd_md;
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
-    memset(&cccd_md, 0, sizeof(cccd_md));
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
-    cccd_md.vloc = BLE_GATTS_VLOC_STACK;
     memset(&char_md, 0, sizeof(char_md));
-    char_md.char_props.notify = 1;
+    char_md.char_props.write         = 1;
+    char_md.char_props.write_wo_resp = 1;
     char_md.p_char_user_desc  = NULL;
     char_md.p_char_pf         = NULL;
     char_md.p_user_desc_md    = NULL;
-    char_md.p_cccd_md         = &cccd_md;
+    char_md.p_cccd_md         = NULL;
     char_md.p_sccd_md         = NULL;
     ble_uuid.type = uuid_type;
     ble_uuid.uuid = BLE_UUID_NUS_TX_CHARACTERISTIC;
@@ -114,11 +110,11 @@ uint16_t uart_tx_char_add(uint8_t uuid_type, uint16_t service_handle){
     memset(&attr_char_value, 0, sizeof(attr_char_value));
     attr_char_value.p_uuid    = &ble_uuid;
     attr_char_value.p_attr_md = &attr_md;
-    attr_char_value.init_len  = sizeof(uint8_t);
+    attr_char_value.init_len  = 1;
     attr_char_value.init_offs = 0;
     attr_char_value.max_len   = BLE_ATTRIBUTE_MAX_VALUE_LENGTH;
     ble_gatts_char_handles_t char_handles;
-    return sd_ble_gatts_characteristic_add(service_handle,
+    sd_ble_gatts_characteristic_add(service_handle,
                                            &char_md,
                                            &attr_char_value,
                                            &char_handles);
