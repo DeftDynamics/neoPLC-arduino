@@ -3,24 +3,24 @@
     {
       "name": "deftdynamics",
       "maintainer": "Deft Dynamics",
-      "websiteURL": "https://github.com/DeftDynamics/neoPLC-arduino",
-      "email": "admin@deftdynamics.com",
+      "websiteURL": "https://www.neoplc.org",
+      "email": "neoplc@deftdynamics.com",
       "help": {
-        "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
+        "online": "https://www.neoplc.org/quickstart-guide/"
       },
       "platforms": [
         {
           "name": "neoPLC Boards",
           "architecture": "nRF52",
-          "version": "0.1",
+          "version": "1.0",
           "category": "Contributed",
           "help": {
-            "online": "https://github.com/DeftDynamics/neoPLC-arduino/issues"
+            "online": "https://www.neoplc.org/quickstart-guide/"
           },
-          "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/0.1.4.tar.gz",
-          "archiveFileName": "neoPLC-arduino-0.1.4.tar.gz",
-          "checksum": "MD5:dd812237b19c5cf2de4a56168bdc8cfb",
-          "size": "533626",
+          "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/1.0.tar.gz",
+          "archiveFileName": "neoPLC-arduino-1.0.tar.gz",
+          "checksum": "MD5:26ee9f7cd48971f74cad191ed9823a5d",
+          "size": "543473",
           "boards": [
             {"name": "neoPLC 1.0"}
           ],
