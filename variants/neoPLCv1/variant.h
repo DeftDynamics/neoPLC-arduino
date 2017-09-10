@@ -90,11 +90,8 @@ static const uint8_t AREF = PIN_AREF;
  *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/
 
- #define BOOTLOADER_DFU_START_BLE 0xB1
- #define BOOTLOADER_DFU_START_SERIAL 0xA1
- void bootload_serial();
- void bootload_ble();
- void initVariant();
- void variant_UART_IRQ_Handler();
+#define APP_CODE_START 0x1C000
+void initVariant();
+void variant_UART_IRQ_Handler();
  
 #endif

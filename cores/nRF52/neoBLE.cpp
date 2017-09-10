@@ -22,8 +22,8 @@
 #define BLE_DFU_REV_CHAR_UUID                0x1534                       /**< The UUID of the DFU Revision Characteristic. */
 
 #define BLE_UUID_NUS_SERVICE            0x0001                       /**< The UUID of the Nordic UART Service. */
-#define BLE_UUID_NUS_TX_CHARACTERISTIC  0x0003                       /**< The UUID of the TX Characteristic. */
-#define BLE_UUID_NUS_RX_CHARACTERISTIC  0x0002                       /**< The UUID of the RX Characteristic. */
+#define BLE_UUID_NUS_TX_CHARACTERISTIC  0x0002                       /**< The UUID of the TX Characteristic. */
+#define BLE_UUID_NUS_RX_CHARACTERISTIC  0x0003                       /**< The UUID of the RX Characteristic. */
 
 #define BLE_STACK_EVT_MSG_BUF_SIZE  (sizeof(ble_evt_t) + (GATT_MTU_SIZE_DEFAULT))
 #define SOFTDEVICE_EVT_IRQ        	SD_EVT_IRQn       /**< SoftDevice Event IRQ number. Used for both protocol events and SoC events. */
@@ -74,6 +74,8 @@ void neoBLE::begin(){
 
 	ble_dfu_init();
 	
+	setDeviceName("neoPLC");
+	
 	start_advertizing();
 }
 
@@ -81,6 +83,15 @@ void neoBLE::setDeviceName(const char* device_name){
 	ble_gap_conn_sec_mode_t sec_mode;
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
     sd_ble_gap_device_name_set(&sec_mode,(const uint8_t *)device_name,strlen(device_name));
+	
+	uint8_t adv_data[31];
+	memset(adv_data, 0x00, sizeof(adv_data));
+	adv_data[0] = (uint8_t)strlen(device_name)+1;
+	adv_data[1] = 0x09;
+	for(uint16_t i=0; i<strlen(device_name);i++){
+		adv_data[i+2] = device_name[i];
+	}
+	sd_ble_gap_adv_data_set(adv_data,31,NULL,0);
 }
 
 bool neoBLE::connected(){

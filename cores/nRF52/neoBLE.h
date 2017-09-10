@@ -11,6 +11,7 @@
 #include <neoBLE_characteristic.h>
 
 #define BLE_ATTRIBUTE_MAX_VALUE_LENGTH 20
+#define RX_BUFFER_SIZE 			255
 #define MAX_DFU_PKT_LEN         20
 #define BLE_CONN_HANDLE_INVALID 0xFFFF
 #define BLE_UUID_OUR_BASE_UUID  {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00} 
@@ -58,7 +59,7 @@ class neoBLE : public Stream{
 		uint16_t _rxHead;
     	uint16_t _rxTail;
     	uint16_t _rxCount() const;
-    	uint8_t _rxBuffer[BLE_ATTRIBUTE_MAX_VALUE_LENGTH];
+    	uint8_t _rxBuffer[RX_BUFFER_SIZE];
     	uint16_t _txCount;
     	uint8_t _txBuffer[BLE_ATTRIBUTE_MAX_VALUE_LENGTH];
 		

@@ -20,6 +20,10 @@
 #include <Arduino.h>
 #include "variant.h"
 #include "nrf52.h"
+#include <nrf_sdm.h>
+#include <nrf_nvic.h>
+
+#include <neoDFU.h>
 
 const uint32_t g_ADigitalPinMap[] = {
 28,
@@ -36,59 +40,17 @@ const uint32_t g_ADigitalPinMap[] = {
 100,
 100,
 20
-
-/*0,
-1,
-2,
-3,
-4,
-5,
-6,
-7,
-8,
-9,
-10,
-11,
-12,
-13,
-14,
-15,
-16,
-17,
-18,
-19,
-20,
-21,
-22,
-23,
-24,
-25,
-26,
-27,
-28,
-29,
-30,
-31
-*/
 };
 
-void bootload_serial(void){
-	NRF_POWER->GPREGRET = BOOTLOADER_DFU_START_SERIAL;
-    NVIC_SystemReset();
-}
-void bootload_ble(void){
-	NRF_POWER->GPREGRET = BOOTLOADER_DFU_START_BLE;
-    NVIC_SystemReset();
-}
-
-void initVariant(void){
-	Serial.core_begin(115200);
-	delay(100);
-	
-}
-
+nrf_nvic_state_t nrf_nvic_state;
 void shutdownISR() __attribute__((weak));
 void shutdownISR() { }
+
+void initVariant(void){
+	neoDFU_init();
+	Serial.core_begin(115200);
+	delay(100);
+}
 
 void variant_UART_IRQ_Handler(){
 	int q = Serial.available();
@@ -97,7 +59,7 @@ void variant_UART_IRQ_Handler(){
 			shutdownISR();
 			Serial.core_end();
 			delay(100);
-			bootload_serial();
+			sd_nvic_SetPendingIRQ(boot_irq_n);
 		}
 	}
 }
