@@ -10,20 +10,20 @@ unsigned int tic = 0;
 uint8_t my_byte = 0;
 
 void setup() {
+  pinMode(led, OUTPUT);               // initialize the digital pin as an output.
+  digitalWrite(led, led_state);   // turn the LED on
  
   delay(2000);
   Serial.println("*** neoBLE Demo ***\n");
   Serial.println("The neoPLC LED will blink until you connect to a phone.");
   Serial.println("We recommend our demo app 'neoPLC' from the iOS app store or on our GitHub.\n");
   
-  pinMode(led, OUTPUT);               // initialize the digital pin as an output.
   
   BLE.begin();                  // begin the BLE softdevice
   BLE.setDeviceName("neoPLC"); // change the blutooth BLE device name
   
   waitForConnection();  // blink the LED until the phone is connected
   
-  digitalWrite(led, led_state);   // turn the LED on
 }
 
 void loop() {

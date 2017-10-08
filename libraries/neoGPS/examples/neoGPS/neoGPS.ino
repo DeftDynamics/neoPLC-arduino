@@ -144,7 +144,11 @@ void printSAT(){
      Serial.printf("\n > GLONASS: ");
      for (int sv = 0; sv < gps.sat.numSVs; sv++){
         if (gps.sat.svData[sv].gnssID == 6) {
-         Serial.printf(" %d,",gps.sat.svData[sv].svID);
+          if (gps.sat.svData[sv].svID == 255){
+             Serial.printf(" ??,");
+          } else {
+             Serial.printf(" %d,",gps.sat.svData[sv].svID);
+          }
         }
      }
      Serial.println();
