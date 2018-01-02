@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "RingBuffer.h"
 
-#define BUFFER_LENGTH 512
+#define BUFFER_LENGTH 1024
 
  // WIRE_HAS_END means Wire has end()
 #define WIRE_HAS_END 1
