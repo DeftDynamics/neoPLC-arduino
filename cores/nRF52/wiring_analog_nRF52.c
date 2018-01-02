@@ -228,7 +228,7 @@ void analogWrite( uint32_t ulPin, uint32_t ulValue )
       pwm->PSEL.OUT[2] = ulPin;
       pwm->PSEL.OUT[3] = ulPin;
       pwm->ENABLE = (PWM_ENABLE_ENABLE_Enabled << PWM_ENABLE_ENABLE_Pos);
-      pwm->PRESCALER = PWM_PRESCALER_PRESCALER_DIV_1;
+      pwm->PRESCALER = PWM_PRESCALER_PRESCALER_DIV_128; // Edited 12/14/17 to match Arduino frequency (490 Hz)
       pwm->MODE = PWM_MODE_UPDOWN_Up;
       pwm->COUNTERTOP = (1 << writeResolution) - 1;
       pwm->LOOP = 0;
