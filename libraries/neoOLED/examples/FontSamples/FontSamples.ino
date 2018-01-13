@@ -1,6 +1,6 @@
 // neoOLED Library Test
 
-#include "neoOLED.h"
+#include <neoOLED.h>
 
 neoOLED oled = neoOLED();
 

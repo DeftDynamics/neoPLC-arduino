@@ -1,0 +1,19 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+neoOLED	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin 		KEYWORD2
+setFont 	KEYWORD2
+setContrast KEYWORD2
+println 	KEYWORD2
+clear  		KEYWORD2
+clearToEOL 	KEYWORD2
+setRow 		KEYWORD2
+
+

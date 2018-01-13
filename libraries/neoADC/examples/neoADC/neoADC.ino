@@ -1,7 +1,6 @@
 // neoPLC-ADC Demo
 
 #include "neoADC.h"
-#include <Wire.h>
 
 neoADC adc = neoADC();
 

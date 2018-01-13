@@ -1,0 +1,29 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+neoLRR	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin 				KEYWORD2
+setModeIdle 		KEYWORD2
+setModeRx 			KEYWORD2
+setModeTx 			KEYWORD2
+sleep 				KEYWORD2
+setTxPower 			KEYWORD2
+poll 				KEYWORD2
+waitForDispatch 	KEYWORD2
+waitForMessage 		KEYWORD2
+setFromAddress 		KEYWORD2
+setToAddress 		KEYWORD2
+reliableData 		KEYWORD2
+lastRssi 			KEYWORD2
+lastSNR 			KEYWORD2
+rxStandby 			KEYWORD2
+available 			KEYWORD2
+read 				KEYWORD2
+peek 				KEYWORD2
+send 				KEYWORD2

@@ -1,0 +1,25 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+neoHAL	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin 		KEYWORD2
+readAngle	KEYWORD2
+setOrigin	KEYWORD2
+angle		KEYWORD2
+degrees		KEYWORD2
+rad			KEYWORD2
+origin		KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MAGNET_MISSING	LITERAL1
+MAGNET_WEAK 	LITERAL1
+MAGNET_OK 		LITERAL1
+MAGNET_STRONG 	LITERAL1

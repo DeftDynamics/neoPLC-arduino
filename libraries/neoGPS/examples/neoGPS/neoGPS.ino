@@ -29,7 +29,7 @@ void setup() {
   delay(2000);
   Serial.print("neoGPS test\n");
 
-  gps.verbose = false;
+  gps.verbose = true;
   gps.begin(1000); //  DDC: default DDC channel is 0x42, default data rate is 1000ms (= 1 Hz)
   
 }
@@ -56,7 +56,7 @@ void loop() {
    
   led_state = !led_state;              
   digitalWrite(LED_BUILTIN,led_state);
-  regulateLoop(0.1); // loop regulation (10 Hz)  
+  regulateLoop(0.2); // loop regulation (10 Hz)  
 }
 
 

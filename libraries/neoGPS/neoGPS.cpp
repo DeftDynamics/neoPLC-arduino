@@ -175,7 +175,15 @@ uint8_t neoGPS::poll(){
 
   uint8_t replyReceived = 0;
   
-    Wire.requestFrom(_address, 255);   // request max buffer (may not get it all, but should get something)
+      Wire.beginTransmission(_address);
+    Wire.write(0xFD);
+    int x = Wire.endTransmission(false);
+    Wire.requestFrom(_address,2);
+    uint16_t len1 = Wire.read();
+    uint16_t len2 = Wire.read();
+    uint16_t Available = ((len1<<8)|len2);  
+
+    Wire.requestFrom(_address, Available);   // request expected # bytes
     while (Wire.available()) {
       char c = Wire.read();
       replyReceived = encode(c);

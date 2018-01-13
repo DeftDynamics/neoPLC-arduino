@@ -39,7 +39,11 @@ const uint32_t g_ADigitalPinMap[] = {
 12,
 100,
 100,
-20
+20,
+23,
+16,
+19,
+14
 };
 
 nrf_nvic_state_t nrf_nvic_state;

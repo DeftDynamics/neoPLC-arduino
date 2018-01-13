@@ -1,6 +1,6 @@
 // neoPLC-ENV Demo
 
-#include "neoENV.h"
+#include <neoENV.h>
 
 neoENV env = neoENV();
 
@@ -31,11 +31,11 @@ void loop() {
   float temp = env.readTemperature();
     Serial.print("Temperature = "); Serial.print(temp); Serial.println(" *C");
   float humi = env.readHumidity();
-    Serial.print("   Humidity = "); Serial.print(humi); Serial.println(" %\n");
+    Serial.print("   Humidity = "); Serial.print(humi); Serial.println(" %");
   float pres = env.readPressure();
     Serial.print("   Pressure = "); Serial.print(pres); Serial.println(" Pa");
   float estAlt = env.readAltitude();
-    Serial.print("  ~Altitude = "); Serial.print(estAlt); Serial.println(" m");
+    Serial.print("  ~Altitude = "); Serial.print(estAlt); Serial.println(" m\n");
     
   led_state = !led_state;              
   digitalWrite(LED_BUILTIN,led_state);
