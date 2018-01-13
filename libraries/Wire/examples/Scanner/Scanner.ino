@@ -2,10 +2,11 @@
 // adapted from http://playground.arduino.cc/Main/I2cScanner
 
 #include <Wire.h>
-
+int led_pin = 13;
 
 void setup() {
   Wire.begin();
+  pinMode(led_pin,OUTPUT);
   Serial.begin(9600);
   while (!Serial);
   Serial.println("\nneoPLC i2c Scanner\n");
@@ -16,6 +17,7 @@ void loop() {
   byte error, address;
   int nDevices;
 
+  digitalWrite(led_pin,HIGH);
   Serial.println("Scanning...");
 
   nDevices = 0;
@@ -52,6 +54,8 @@ void loop() {
   } else {
     Serial.println("done\n");
   }
+  digitalWrite(led_pin,LOW);
+  
   delay(1000);           // wait 5 seconds for next scan
 }
 

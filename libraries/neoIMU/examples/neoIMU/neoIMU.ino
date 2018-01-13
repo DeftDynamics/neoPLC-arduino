@@ -1,6 +1,6 @@
 // neoPLC-IMU Demo
 
-#include "neoIMU.h"       // Bosch BMX055 setup and parse
+#include <neoIMU.h>       // Bosch BMX055 setup and parse
 
 neoIMU imu = neoIMU();
 
