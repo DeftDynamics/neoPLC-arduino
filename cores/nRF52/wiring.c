@@ -37,6 +37,7 @@ void init( void )
   NRF_RTC1->PRESCALER = 0;
   NRF_RTC1->EVTENSET = offsetof(NRF_RTC_Type, EVENTS_OVRFLW);
   NRF_RTC1->INTENSET = offsetof(NRF_RTC_Type, EVENTS_OVRFLW);
+  //NRF_RTC1->INTENSET = RTC_INTENSET_OVRFLW_Msk; // is this better? (AG 1/13/18)
   NRF_RTC1->TASKS_START = 1;
 }
 

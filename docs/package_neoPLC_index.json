@@ -48,7 +48,7 @@
           "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/1.3.tar.gz",
           "archiveFileName": "neoPLC-arduino-1.3.tar.gz",
           "checksum": "MD5:464510f140c96d531d91558edde1b19a",
-          "size": "543473",
+          "size": "633640",
           "boards": [
             {"name": "neoPLC 1.0"}
           ],
