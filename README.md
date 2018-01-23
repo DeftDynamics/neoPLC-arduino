@@ -4,7 +4,7 @@ Program neoPLC boards with the [Arduino](https://www.arduino.cc) IDE.
 
 ## Supported boards
 
- * [neoPLC v1.0]()
+ * [neoPLC v1.0](https://www.neoplc.org/shop/microcontroller-ble)
 
 ## Installing
 
