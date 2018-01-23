@@ -1,0 +1,19 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+neoBAT	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+poll 		KEYWORD2
+pollAll		KEYWORD2
+reset		KEYWORD2
+vcell		KEYWORD2
+soc			KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

@@ -1,0 +1,25 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Eigen	 KEYWORD1
+matrix   KEYWORD1
+MatrixXf KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+setZero     KEYWORD2
+setIdentity KEYWORD2
+maxCoeff    KEYWORD2
+minCoeff    KEYWORD2
+rows        KEYWORD2
+cols        KEYWORD2
+array       KEYWORD2
+abs         KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
