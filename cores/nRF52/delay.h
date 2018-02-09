@@ -63,16 +63,18 @@ extern void delay( uint32_t dwMs ) ;
  *
  * \param dwUs the number of microseconds to pause (uint32_t)
  */
-static __inline__ void delayMicroseconds( uint32_t ) __attribute__((always_inline, unused)) ;
-static __inline__ void delayMicroseconds( uint32_t usec )
-{
-  if ( usec == 0 )
-  {
-    return ;
-  }
-
-  nrf_delay_us(usec);
-}
+    
+extern void delayMicroseconds( uint32_t dwMs ) ;
+//static __inline__ void delayMicroseconds( uint32_t ) __attribute__((always_inline, unused)) ;
+//static __inline__ void delayMicroseconds( uint32_t usec )
+//{
+//  if ( usec == 0 )
+//  {
+//    return ;
+//  }
+//
+//  nrf_delay_us(usec);
+//}
 
 #ifdef __cplusplus
 }

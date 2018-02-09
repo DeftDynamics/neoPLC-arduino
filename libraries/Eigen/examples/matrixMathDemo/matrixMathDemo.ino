@@ -4,7 +4,7 @@
 #include <Eigen/LU>          // Inverse, determinant, LU decompositions with solver (FullPivLU, PartialPivLU)
 //#include <Eigen/Cholesky>    // LLT and LDLT Cholesky factorization with solver
 //#include <Eigen/Householder> // Householder transformations; this module is used by several linear algebra modules
-#include <Eigen/SVD>         // SVD decompositions with least-squares solver (JacobiSVD, BDCSVD)
+//#include <Eigen/SVD>         // SVD decompositions with least-squares solver (JacobiSVD, BDCSVD)
 //#include <Eigen/QR>          // QR decomposition with solver (HouseholderQR, ColPivHouseholderQR, FullPivHouseholderQR)
 //#include <Eigen/Eigenvalues> // Eigenvalue, eigenvector decompositions (EigenSolver, SelfAdjointEigenSolver, ComplexEigenSolver)
 //#include <Eigen/Sparse>      // Sparse matrix storage and related basic linear algebra (SparseMatrix, SparseVector)
