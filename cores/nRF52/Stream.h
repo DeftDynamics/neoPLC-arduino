@@ -1,4 +1,4 @@
-/*
+ /*
   Stream.h - base class for character-based streams.
   Copyright (c) 2010 David A. Mellis.  All right reserved.
 

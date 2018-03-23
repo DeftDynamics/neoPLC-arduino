@@ -7,7 +7,7 @@ neoBLE_service::neoBLE_service(uint16_t service_handle, uint8_t uuid_type){
 	_uuid_type = uuid_type;
 }
 
-neoBLE_characteristic* neoBLE_service::add_characteristic(uint16_t uuid, uint8_t properties, const char* str_description, uint8_t format){
+neoBLE_characteristic* neoBLE_service::addCharacteristic(uint16_t uuid, uint8_t properties, const char* str_description, uint8_t format){
 	//UUID
 	ble_uuid_t      	char_uuid;
 	char_uuid.uuid      = uuid;
@@ -20,7 +20,7 @@ neoBLE_characteristic* neoBLE_service::add_characteristic(uint16_t uuid, uint8_t
 	ble_gatts_attr_md_t 		cccd_md;
 	
 	//if cccd
-	if(properties & (BLENotify | BLEIndicate)){
+	if(properties & (neoBLENotify | neoBLEIndicate)){
 		memset(&cccd_md, 0, sizeof(cccd_md));
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
@@ -42,22 +42,22 @@ neoBLE_characteristic* neoBLE_service::add_characteristic(uint16_t uuid, uint8_t
 		char_md.p_sccd_md         = NULL;
 	}
 	
-	if(properties & BLEBroadcast){
+	if(properties & neoBLEBroadcast){
 		char_md.char_props.broadcast 		= 1;
 	}
-	if(properties & BLERead){
+	if(properties & neoBLERead){
 		char_md.char_props.read 			= 1;
 	}
-	if(properties & BLEWriteWithoutResponse){
+	if(properties & neoBLEWriteWithoutResponse){
 		char_md.char_props.write_wo_resp 	= 1;
 	}
-	if(properties & BLEWrite){
+	if(properties & neoBLEWrite){
 		char_md.char_props.write 			= 1;
 	}
-	if(properties & BLENotify){
+	if(properties & neoBLENotify){
 		char_md.char_props.notify 			= 1;
 	}
-	if(properties & BLEIndicate){
+	if(properties & neoBLEIndicate){
 		char_md.char_props.indicate 		= 1;
 	}
 	//char_md.char_props.auth_signed_wr 		= 0;
@@ -105,11 +105,11 @@ neoBLE_characteristic* neoBLE_service::add_characteristic(uint16_t uuid, uint8_t
 	return new neoBLE_characteristic(char_handles.value_handle, _uuid_type);
 }
 
-neoBLE_characteristic* neoBLE_service::add_characteristic(uint16_t uuid){
-	return add_characteristic(uuid, BLERead | BLEWrite, "", 0xFF);
+neoBLE_characteristic* neoBLE_service::addCharacteristic(uint16_t uuid){
+	return addCharacteristic(uuid, neoBLERead | neoBLEWrite, "", 0xFF);
 }
 
-void neoBLE_service::add_descriptor(uint16_t uuid, const char* attr_value){
+void neoBLE_service::addDescriptor(uint16_t uuid, const char* attr_value){
 	//UUID
 	ble_uuid_t      desc_uuid;
 	ble_uuid128_t   base_uuid = BLE_UUID_OUR_BASE_UUID;

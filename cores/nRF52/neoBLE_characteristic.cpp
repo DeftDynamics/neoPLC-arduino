@@ -6,21 +6,21 @@ neoBLE_characteristic::neoBLE_characteristic(uint16_t value_handle, uint8_t uuid
 	_uuid_type=uuid_type;
 }
 
-void neoBLE_characteristic::set_value(const uint8_t value[], uint8_t length){
+void neoBLE_characteristic::setValue(const uint8_t value[], uint8_t length){
 	ble_gatts_value_t new_value;
 	new_value.len = length;
 	new_value.offset = 0;
 	new_value.p_value = (uint8_t*)value;
 	sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID, _value_handle, &new_value);
 }
-void neoBLE_characteristic::set_value(const char* value){
-	set_value((const uint8_t*) value, strlen(value));
+void neoBLE_characteristic::setValue(const char* value){
+	setValue((const uint8_t*) value, strlen(value));
 }
-void neoBLE_characteristic::set_value(int value){
-	set_value((const uint8_t*) &value, sizeof(int));
+void neoBLE_characteristic::setValue(int value){
+	setValue((const uint8_t*) &value, sizeof(int));
 }
 
-void neoBLE_characteristic::add_descriptor(uint16_t uuid, const char* attr_value){
+void neoBLE_characteristic::addDescriptor(uint16_t uuid, const char* attr_value){
 	//UUID
 	ble_uuid_t      desc_uuid;
 	ble_uuid128_t   base_uuid = BLE_UUID_OUR_BASE_UUID;

@@ -118,6 +118,41 @@ void neoGPS::configDataRate(uint16_t Rate){
   waitForAckNack();
 }
 
+void neoGPS::configOdometer(uint8_t mode, bool withReset) {
+  // configuration: page 200
+  // reset: page 313
+
+  uint8_t flags = 0b00001001; // 09
+  uint8_t odoCfg = mode; // 0=running, 1=cycling, 2=swimming, 3=car, 4=custom //03
+
+  //               { hdr,  hdr, cls,   ID,  ln1,  ln2 | version, resv1, resv1, resv1, flags, odoCfg, resv2, resv2, resv2, resv2, resv2, resv2, cogMaxV, cogMaxP, resv3, resv3, vLPGain, cogLPGain, resv4, resv4, | ckA,  ckB}
+  char message[] = {  MU, BLOX, CFG, _ODO, 0x14, 0x00,     0x00,  0x00,  0x00,  0x00, flags, odoCfg,  0x00,  0x00,  0x00,  0x00,  0x00,  0x00,    0x00,    0x00,  0x00,  0x00,    0x00,      0x00,  0x00,  0x00,  0x00, 0x00};
+  ubxChecksumAndSend(message, sizeof(message));
+  
+  if (!withReset){
+	  if (verbose)
+	  {
+		Serial.printf("configure odometer (no reset)... ");
+	  }
+	  waitForAckNack();
+  } else {
+	  if (verbose)
+	  {
+		Serial.printf("configure odometer (step 1/2)... ");
+	  }
+	  waitForAckNack();
+
+		//              { hdr,  hdr, cls,       ID,  ln1,  ln2, | none | ckA,  ckB}
+	  char message2[] = {  MU, BLOX, NAV, RESETODO, 0x00, 0x00,         0x00, 0x00};
+	  ubxChecksumAndSend(message2, sizeof(message2));
+		if (verbose)
+	  {
+		Serial.printf("reset odometer (step 2/2)... ");
+	  }
+	  waitForAckNack();
+  }
+}
+
 void neoGPS::get(char Class, char ID){
   char message[] = {  MU,BLOX,Class,ID,0x00,0x00,0x00,0x00};
   ubxChecksumAndSend(message,sizeof(message));
@@ -293,6 +328,11 @@ uint8_t neoGPS::parse(char *buffer){
              parse_NAV_SAT(nav_sat);
              if (verbose) {Serial.print("NAV-SAT parsed\n");}
              return 1;
+        } else if (buffer[3] == ODO){  // NAV-ODO
+             memcpy(nav_odo.raw,buffer+6,20);
+             parse_NAV_ODO(nav_odo);
+             if (verbose) {Serial.print("NAV-ODO parsed\n");}
+             return 1;
         } else {
              if (verbose){Serial.print("unknown NAV message\n");}
              return 0;
@@ -406,6 +446,17 @@ void neoGPS::parse_NAV_SAT(NAV_SAT x){
     }
     
     sat.isUpdated = true;
+}
+
+// ------------------------------------ NAV-ODO -------------------------------------
+
+void neoGPS::parse_NAV_ODO(NAV_ODO x){
+  odo.version = x.pcs.version;    // -
+  odo.iTOW = x.pcs.iTOW;          // ms
+  odo.distance = x.pcs.distance;  // m
+  odo.totalDistance = x.pcs.totalDistance;  // m
+  odo.std = x.pcs.distanceStd;    // m
+  odo.isUpdated = true;
 }
 
 

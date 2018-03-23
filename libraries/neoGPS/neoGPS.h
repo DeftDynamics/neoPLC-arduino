@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define   _HNR 0x5C // CFG
 #define    MSG 0x01
+#define   _ODO 0x1E
 #define   NAV5 0x24
 #define  NAVX5 0x23
 #define    PRT 0x00
@@ -87,6 +88,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define    ATT 0x05 // NAV
 #define    PVT 0x07
+#define    ODO 0x09
+#define RESETODO 0x10
 #define   SVIN 0x3B
 #define STATUS 0x03
 #define RELPOSNED 0x3C
@@ -135,7 +138,9 @@ class neoGPS
     neoGPS(uint8_t addr = 0x42);
     void begin(uint32_t Rate);
  uint8_t poll();
-    
+    void configOdometer(uint8_t mode, bool withReset=false); 
+    void enableMessage(uint8_t CL, uint8_t ID, uint8_t IsOn);
+  
     bool verbose = false;
     int TIMEZONE_OFFSET = -5; // CST = -6, CDT = -5
     bool ackNak = false;
@@ -289,6 +294,32 @@ class neoGPS
      
    } sat;
    
+// --------------------  NAV-ODO --------------------
+
+   union NAV_ODO {
+      char raw[20];
+      struct {
+		U1 version;       // -
+		U1 reserved1;     // -
+		U1 reserved2;     // -
+		U1 reserved3;     // -
+        U4 iTOW;          // ms
+		U4 distance;      // m
+		U4 totalDistance; // m
+		U4 distanceStd;   // m
+      } pcs;
+    } nav_odo;
+    
+   struct {
+        U1 version;       // -
+		U4 iTOW;          // -
+		U4 distance;      // m
+		U4 totalDistance; // m
+		U4 std;           // m
+
+   bool isUpdated = false;
+   } odo;
+   
    
 // ------------------------------------ Private Variables & Methods -------------------------------------
  private:
@@ -299,7 +330,6 @@ uint16_t _address = 0x42;
     void configMessageRate(uint8_t CL, uint8_t ID, uint8_t IsOn);
     void configDDCPort(uint32_t Baud, bool UBX_in, bool NMEA_in, bool RTCM3_in, bool UBX_out, bool NMEA_out, bool RTCM3_out);
     void configDataRate(uint16_t Rate);
-    void enableMessage(uint8_t CL, uint8_t ID, uint8_t IsOn);
     void get(char Class, char ID);
 
  uint8_t waitForAckNack(uint32_t timeout=100);
@@ -311,6 +341,7 @@ uint16_t _address = 0x42;
     
     void parse_NAV_PVT(NAV_PVT x);
     void parse_NAV_SAT(NAV_SAT x);
+    void parse_NAV_ODO(NAV_ODO x);
 
 };
 

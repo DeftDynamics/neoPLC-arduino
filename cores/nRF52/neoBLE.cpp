@@ -67,16 +67,16 @@ void neoBLE::begin(){
 	init();
 	
 	const ble_uuid128_t NUS_UUID ={ { 0x9E, 0xCA, 0xDC, 0x24, 0x0E, 0xE5, 0xA9, 0xE0, 0x93, 0xF3, 0xA3, 0xB5, 0x00, 0x00, 0x40, 0x6E } };
-	_nus_service = add_service(NUS_UUID,BLE_UUID_NUS_SERVICE);
-	_nus_service->add_descriptor(0x2901,"UART");
-	_rx_char = _nus_service->add_characteristic(BLE_UUID_NUS_RX_CHARACTERISTIC, BLENotify, "", 0xFF);
-	_tx_char = _nus_service->add_characteristic(BLE_UUID_NUS_TX_CHARACTERISTIC, BLEWrite|BLEWriteWithoutResponse, "", 0xFF);
+	_nus_service = addService(NUS_UUID,BLE_UUID_NUS_SERVICE);
+	_nus_service->addDescriptor(0x2901,"UART");
+	_rx_char = _nus_service->addCharacteristic(BLE_UUID_NUS_RX_CHARACTERISTIC, neoBLENotify, "", 0xFF);
+	_tx_char = _nus_service->addCharacteristic(BLE_UUID_NUS_TX_CHARACTERISTIC, neoBLEWrite|neoBLEWriteWithoutResponse, "", 0xFF);
 
 	ble_dfu_init();
 	
 	setDeviceName("neoPLC");
 	
-	start_advertizing();
+	startAdvertizing();
 }
 
 void neoBLE::setDeviceName(const char* device_name){
@@ -147,14 +147,14 @@ void neoBLE::_received(const uint8_t* data, uint16_t size) {
   
 }
 
-void neoBLE::event_handler(ble_evt_t * p_ble_evt){
+void neoBLE::eventHandler(ble_evt_t * p_ble_evt){
 	switch (p_ble_evt->header.evt_id){
 		case BLE_GAP_EVT_CONNECTED:
 			_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
 		break;
 		case BLE_GAP_EVT_DISCONNECTED:
 			_conn_handle = BLE_CONN_HANDLE_INVALID;
-			start_advertizing();
+			startAdvertizing();
 		break;
 		case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
             sd_ble_gap_sec_params_reply(_conn_handle, BLE_GAP_SEC_STATUS_PAIRING_NOT_SUPP, NULL, NULL);
@@ -255,7 +255,7 @@ void neoBLE::init(){
 	sd_ble_gap_tx_power_set(0);
 }
 
-void neoBLE::start_advertizing(){
+void neoBLE::startAdvertizing(){
 	ble_gap_adv_params_t advertisingParameters;
 
 	memset(&advertisingParameters, 0x00, sizeof(advertisingParameters));
@@ -270,7 +270,7 @@ void neoBLE::start_advertizing(){
 	sd_ble_gap_adv_start(&advertisingParameters);
 }
 
-neoBLE_service* neoBLE::add_service(ble_uuid128_t base_uuid, uint16_t uuid){
+neoBLE_service* neoBLE::addService(ble_uuid128_t base_uuid, uint16_t uuid){
 	ble_uuid_t      	service_uuid;
 	service_uuid.uuid 	= uuid;
 	sd_ble_uuid_vs_add(&base_uuid, &service_uuid.type);  
@@ -280,9 +280,9 @@ neoBLE_service* neoBLE::add_service(ble_uuid128_t base_uuid, uint16_t uuid){
 	return new neoBLE_service(service_handle,service_uuid.type);
 }
 
-neoBLE_service* neoBLE::add_service(uint16_t uuid){
+neoBLE_service* neoBLE::addService(uint16_t uuid){
 	ble_uuid128_t   	base_uuid = BLE_UUID_OUR_BASE_UUID;
-	return add_service(base_uuid,uuid);
+	return addService(base_uuid,uuid);
 }
 
 neoBLE BLE;
@@ -302,7 +302,7 @@ void SOFTDEVICE_EVT_IRQHandler(){
                 //APP_ERROR_HANDLER(err_code);
             }else{
                 // Call application's BLE stack event handler.
-                BLE.event_handler((ble_evt_t *)mp_ble_evt_buffer);
+                BLE.eventHandler((ble_evt_t *)mp_ble_evt_buffer);
             }
         }else{
 			break;

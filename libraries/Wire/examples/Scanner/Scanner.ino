@@ -59,7 +59,6 @@ void loop() {
   delay(1000);           // wait 5 seconds for next scan
 }
 
-
 void printKnownChips(byte address)
 {
   switch (address) {
@@ -68,14 +67,16 @@ void printKnownChips(byte address)
     case 0x19: Serial.print("neoPLC-IMU Inertial Measurement Unit: Accelerometer"); break;
     case 0x27: Serial.print("neoPLC-DIO Digital Input/Output"); break;
     case 0x28: Serial.print("neoPLC-TCA Thermocouple Amplifier"); break;
-    case 0x36: Serial.print("neoPLC-HAL Hall Effect Rotary Sensor or ");
+    case 0x36: Serial.print("neoPLC-HAL Hall Effect Rotary Sensor or\n");
                Serial.print("neoPLC-BAT Battery Charge Monitor"); break;
     case 0x3C: Serial.print("neoPLC-OLED 64x48 Display"); break;
     case 0x43: Serial.print("neoPLC-PWM Pulse Width Output (Single Board)"); break;
     case 0x48: Serial.print("neoPLC-ADC Analog Input"); break;
+    case 0x50: case 0x51: case 0x52: case 0x53: case 0x58: case 0x59: case 0x5A: case 0x5B:
+               Serial.print("neoPLC-RAM EEPROM Memory (has 8 unique addresses)"); break;
     case 0x69: Serial.print("neoPLC-IMU Inertial Measurement Unit: Gyroscope"); break;
     case 0x70: Serial.print("neoPLC-PWM Pulse Width Output (All Call)"); break;
     case 0x77: Serial.print("neoPLC-ENV Environmental Sensor (Pressure/Temperature/Humidity)"); break;
-    default: Serial.print(F("not recognized: neoPLC with adjusted address?"));
+    default: Serial.printf("device not recognized: neoPLC with adjusted address?");
   }
 }

@@ -31,6 +31,9 @@ void setup() {
 
   gps.verbose = true;
   gps.begin(1000); //  DDC: default DDC channel is 0x42, default data rate is 1000ms (= 1 Hz)
+
+  gps.configOdometer(0,true); // 0=running, 1=cycling, 2=swimming, 3=car, 4=custom
+  gps.enableMessage(NAV,ODO,0x01);
   
 }
 
@@ -41,12 +44,15 @@ void loop() {
 // // all messages need this for parsing
    gps.poll();
 
-// normal PVT solution
    if (gps.pvt.isUpdated == true){
       gps.pvt.isUpdated = false;
       printPVT();
    }
 
+   if (gps.odo.isUpdated == true){
+      gps.odo.isUpdated = false;
+      printODO();
+   }
    
    if (gps.sat.isUpdated == true){
       gps.sat.isUpdated = false;
@@ -69,6 +75,12 @@ void regulateLoop(float dt)
   uint32_t dT = int(dt*1000000);
   while((micros()-prev_time)<dT) {}
   prev_time = micros();
+}
+
+void printODO(){
+     Serial.printf("ODO data\n");
+     Serial.printf("> version = %d, iTOW = %d\n",gps.odo.version,gps.odo.iTOW);
+     Serial.printf("> totalDistance = %d, distance = %d, std = %d\n\n",gps.odo.totalDistance,gps.odo.distance,gps.odo.std);
 }
 
 void printPVT(){
@@ -105,7 +117,6 @@ void printPVT(){
      
      Serial.printf(" >  magDec = %1.3f deg\n",gps.pvt.magDec);
      Serial.printf(" >  magAcc = %1.3f deg\n\n",gps.pvt.magAcc);
-     
 
      // use this if your microcontroller doesn't support 'Serial.printf'
      /*
@@ -163,4 +174,3 @@ void printSAT(){
      }
      
 }
-

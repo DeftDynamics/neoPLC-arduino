@@ -1,0 +1,20 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+neoADC_P	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+begin 					KEYWORD2
+read					KEYWORD2
+readConfiguration		KEYWORD2
+configure				KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+CONTINUOUS   LITERAL1
+SINGLESHOT   LITERAL1

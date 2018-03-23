@@ -16,23 +16,25 @@
 #define BLE_CONN_HANDLE_INVALID 0xFFFF
 #define BLE_UUID_OUR_BASE_UUID  {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00} 
 
-enum BLEProperty {
-  BLEBroadcast            = 0x01,
-  BLERead                 = 0x02,
-  BLEWriteWithoutResponse = 0x04,
-  BLEWrite                = 0x08,
-  BLENotify               = 0x10,
-  BLEIndicate             = 0x20
-};
+
+		enum neoBLEProperty {
+		  neoBLEBroadcast            = 0x01,
+		  neoBLERead                 = 0x02,
+		  neoBLEWriteWithoutResponse = 0x04,
+		  neoBLEWrite                = 0x08,
+		  neoBLENotify               = 0x10,
+		  neoBLEIndicate             = 0x20
+		};
+
 
 class neoBLE : public Stream{
 	public:
 		neoBLE();
-		void event_handler(ble_evt_t * p_ble_evt);
+		void eventHandler(ble_evt_t * p_ble_evt);
 		void begin();
 		void init();
 		void setDeviceName(const char* device_name);
-		void start_advertizing();
+		void startAdvertizing();
 		
 		bool connected();
 		int available();
@@ -42,8 +44,8 @@ class neoBLE : public Stream{
 		size_t write(uint8_t byte);
 		using Print::write;
 
-		neoBLE_service* add_service(ble_uuid128_t base_uuid, uint16_t uuid);
-		neoBLE_service* add_service(uint16_t uuid);
+		neoBLE_service* addService(ble_uuid128_t base_uuid, uint16_t uuid);
+		neoBLE_service* addService(uint16_t uuid);
 		
 	private:
 		uint16_t _conn_handle=BLE_CONN_HANDLE_INVALID;
