@@ -204,6 +204,34 @@
               "version": "0.0"
             }
           ]
+        },
+        {
+          "name": "neoPLC Boards",
+          "architecture": "nRF52",
+          "version": "1.7",
+          "category": "Contributed",
+          "help": {
+            "online": "https://www.neoplc.org/quickstart-guide/"
+          },
+          "url": "https://github.com/DeftDynamics/neoPLC-arduino/archive/1.7.tar.gz",
+          "archiveFileName": "neoPLC-arduino-1.7.tar.gz",
+          "checksum": "MD5:2760d05439550ec7012aa03ab6421c2a",
+          "size": "1438046",
+          "boards": [
+            {"name": "neoPLC 1.0"}
+          ],
+          "toolsDependencies": [
+            {
+              "packager": "deftdynamics",
+              "name": "gcc-arm-none-eabi",
+              "version": "5_2-2015q4"
+            },
+            {
+              "packager": "deftdynamics",
+              "name": "nrfutil",
+              "version": "0.0"
+            }
+          ]
         }
       ],
       "tools":[
