@@ -247,7 +247,25 @@ class neoIMU {
     float readTemp();
 
     float ax,ay,az,gx,gy,gz,mx,my,mz;
-
+	
+	union {
+	  char raw[];
+	  struct {
+		 uint8_t header;   // alignment header
+		 uint8_t ID;       // message ID
+		 int16_t ax;       // X acceleration (mg)
+		 int16_t ay;       // Y acceleration (mg)
+		 int16_t az;       // Z acceleration (mg)
+		 int16_t gx;       // X rotation rate (deg/s)
+		 int16_t gy;       // Y rotation rate (deg/s)
+		 int16_t gz;       // Z rotation rate (deg/s)
+		 int16_t mx;       // X magnetic flux (mG)
+		 int16_t my;       // Y magnetic flux (mG)
+		 int16_t mz;       // Z magnetic flux (mG)
+	  } pcs;
+	} DX;
+	
+	void updateDX();
 
   private:
     uint8_t _addr_acc = 0x19;

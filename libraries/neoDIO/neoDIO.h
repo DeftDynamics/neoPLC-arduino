@@ -60,13 +60,36 @@ class neoDIO {
     void digitalWrite(uint8_t p, uint8_t d);
     void pullUp(uint8_t p, uint8_t d);
     uint8_t digitalRead(uint8_t p);
-
+	
+	union {
+		char raw[20];
+		struct {
+			 uint8_t header;      // alignment header
+			 uint8_t ID;          // message ID
+			 uint8_t mode;        // direction IN/OUT
+			 uint8_t state;       // high/lower_bound
+			uint16_t reserve1;
+			uint16_t reserve2;
+			uint16_t reserve3;
+			uint16_t reserve4;
+			uint16_t reserve5;
+			uint16_t reserve6;
+			uint16_t reserve7;
+			uint16_t reserve8;
+		} pcs;
+	} DX;
+	
+	void updateDX();
+	
  private:
     uint8_t i2caddr = 0x27;
     uint8_t regForPin(uint8_t pin, uint8_t portAaddr, uint8_t portBaddr);
     uint8_t readRegister(uint8_t addr);
     void writeRegister(uint8_t addr, uint8_t value);
     void updateRegisterBit(uint8_t p, uint8_t pValue, uint8_t Addr);
+	
+	uint8_t mode;
+	uint8_t state;
 };
 
 //// registers

@@ -1,6 +1,7 @@
 // neoOLED Library Test
 
 #include <neoOLED.h>
+#include <neoBLE.h>
 
 neoOLED oled = neoOLED();
 
@@ -60,6 +61,7 @@ uint8_t nFont = sizeof(fontList)/sizeof(uint8_t*);
 
 //------------------------------------------------------------------------------
 void setup() {    
+  BLE.begin();
   oled.begin();  
 }
 void loop() {
@@ -72,9 +74,23 @@ void loop() {
     oled.println("*+,-./0123456789:");
     oled.println("abcdefghijklmno");
     oled.println("ABCDEFGHIJKLMNO");
+    copyToApp();
     delay(2000);    
   }
   oled.clear();
   oled.print("Done!");
+  copyToApp();
   delay(5000);    
+}
+
+void copyToApp(){
+  // because there are 384 bytes in the OLED display, it requires 24 updates over BLE to transfer the image via bluetooth
+  for (int i=0; i<24; i++){
+    // faster but less reliable if we only update the pixels that have changed since the last update:
+    //if (oled.updateDX(i)) {
+    oled.updateDX(i);
+    BLE.post(oled.DX.raw);
+    delay(10);
+    //}
+  }
 }

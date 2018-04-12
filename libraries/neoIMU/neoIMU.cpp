@@ -84,6 +84,20 @@ bool neoIMU::begin(int acc_range, int acc_bw, int gyro_range, int gyro_bw, int m
   }
 }
 
+void neoIMU::updateDX(){
+  DX.pcs.header = 0xD0;
+  DX.pcs.ID = 0x01;
+  DX.pcs.ax = ax*1000;
+  DX.pcs.ay = ay*1000;
+  DX.pcs.az = az*1000;
+  DX.pcs.gx = gx*100;
+  DX.pcs.gy = gy*100;
+  DX.pcs.gz = gz*100;
+  DX.pcs.mx = mx*100;
+  DX.pcs.my = my*100;
+  DX.pcs.mz = mz*100;
+}
+
 void neoIMU::pollAccel()
 {
   uint8_t rawData[6];
@@ -100,6 +114,7 @@ void neoIMU::pollAccel()
     ay = (float)raw_ay*_acc_res;
     az = (float)raw_az*_acc_res;
   }
+  updateDX();
 }
 
 void neoIMU::pollGyro()
@@ -115,6 +130,7 @@ void neoIMU::pollGyro()
     gx = (float)raw_gx*_gyro_res;
     gy = (float)raw_gy*_gyro_res;
     gz = (float)raw_gz*_gyro_res;
+	updateDX();
 }
 
 void neoIMU::pollMag()
@@ -150,7 +166,7 @@ void neoIMU::pollMag()
     mx = (float)raw_mx*_mag_res;
     my = (float)raw_my*_mag_res;
     mz = (float)raw_mz*_mag_res;
-    
+    updateDX();
    }
 }
 

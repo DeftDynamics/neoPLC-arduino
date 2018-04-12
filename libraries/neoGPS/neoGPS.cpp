@@ -407,6 +407,7 @@ void neoGPS::parse_NAV_PVT(NAV_PVT x){
   pvt.magAcc = x.pcs.magAcc*1e-2;  // deg
   
   pvt.isUpdated = true;
+  updateDX();
 }
 
 
@@ -475,4 +476,34 @@ void neoGPS::printCharArray(char message[], uint32_t mLength){
   Serial.print("}");
 }
 
+
+void neoGPS::updateDX(){
+
+  // D2 - NAV data (1/2)
+  DXa.pcs.header = 0xD0;
+  DXa.pcs.ID = 0x02;
+  DXa.pcs.flags = (pvt.fixType<<5)|(pvt.numSV & 0b00011111);  // fix with neoGPS
+  DXa.pcs.hAcc = min(255,pvt.hAcc*10); 
+  DXa.pcs.iTOW = pvt.iTOW;
+  DXa.pcs.lon = pvt.lon*1e7;
+  DXa.pcs.lat = pvt.lat*1e7;
+  DXa.pcs.height = pvt.height*1000;
+  
+  // D3 - NAV data (2/2)
+  DXb.pcs.header = 0xD0;
+  DXb.pcs.ID = 0x03;
+  DXb.pcs.year = pvt.year;
+  DXb.pcs.month = pvt.month;
+  DXb.pcs.day = pvt.day;
+  DXb.pcs.hour = pvt.hour;
+  DXb.pcs.min = pvt.min;
+  DXb.pcs.sec = (pvt.sec*1000+pvt.tOff*1000);
+  DXb.pcs.velN = pvt.velN*100;
+  DXb.pcs.velE = pvt.velE*100;
+  DXb.pcs.velD = pvt.velD*100;
+  DXb.pcs.heading = pvt.headMot*1000;
+  DXb.pcs.sAcc = min(255,pvt.sAcc*10);
+  DXb.pcs.vAcc = min(255,pvt.vAcc*10);
+  
+}
 

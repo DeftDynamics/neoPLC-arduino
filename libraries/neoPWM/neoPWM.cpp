@@ -64,6 +64,12 @@ void neoPWM::begin(float freq) {
   setPWMFreq(freq);
 }
 
+void neoPWM::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 8;
+	// other components are updated elsewhere
+}
+
 
 void neoPWM::setPWMFreq(float freq) {
   //Serial.print("Attempting to set freq ");
@@ -100,6 +106,8 @@ void neoPWM::setPWM(uint8_t num, uint16_t on, uint16_t off) {
 // the pulse for sinking to ground.  Val should be a value from 0 to 4095 inclusive.
 void neoPWM::analogWrite(uint8_t num, uint16_t val, bool invert)
 {
+  DX.pcs.val[num] = val;
+  updateDX();
   // Clamp value between 0 and 4095 inclusive.
   val = min(val, 4095);
   val = val + (512*num); //delete me
@@ -137,6 +145,10 @@ void neoPWM::zeroAll()
     for(int i = 0; i<16; i++){
 		setPWM(i, 0, 4096);
 	}
+	for(int i = 0; i<8; i++){
+        DX.pcs.val[i] = 0;
+	}
+    updateDX();
 }
 
 void neoPWM::softPWM(uint16_t PWM_vals[8])
@@ -146,8 +158,10 @@ void neoPWM::softPWM(uint16_t PWM_vals[8])
   for (uint8_t i=0; i<8; i++){
     uint16_t off = PWM_sum;                 // off until end of earlier commands 
     PWM_sum = (PWM_sum+PWM_vals[i]) % 4095; // on until end of earlier commands + new command mod 1.0
+    DX.pcs.val[i] = PWM_vals[i];
     setPWM(i,off,PWM_sum);
   }
+  updateDX();
 }
 
 uint8_t neoPWM::read8(uint8_t addr) {

@@ -138,6 +138,15 @@ size_t neoBLE::write(uint8_t byte) {
   return 1;
 }
 
+void neoBLE::post(char* DX){
+  //BLE.flush();
+  _txCount = 0; // force the outgoing buffer back to the first index since we Will write 20 bytes
+  for (int i=0; i<20; i++) {
+    BLE.write(DX[i]);
+  }
+  //BLE.flush();
+}
+
 void neoBLE::_received(const uint8_t* data, uint16_t size) {
   //Serial.println("_recieved");
   for (int i = 0; i < size; i++) {

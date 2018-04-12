@@ -1,14 +1,19 @@
 // neoPLC-ENV Demo
 
 #include <neoENV.h>
+#include <neoBLE.h>
 
 neoENV env = neoENV();
+
 
 bool led_state = true;
 
 // -------- Setup --------
 
 void setup() {
+  
+  BLE.begin();
+
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
 
@@ -22,6 +27,7 @@ void setup() {
     Serial.println("Could not connect");
     while (1==1){};
   }
+
   regulateLoop(1.0);
 }
 
@@ -36,7 +42,9 @@ void loop() {
     Serial.print("   Pressure = "); Serial.print(pres); Serial.println(" Pa");
   float estAlt = env.readAltitude();
     Serial.print("  ~Altitude = "); Serial.print(estAlt); Serial.println(" m\n");
-    
+
+  BLE.post(env.DX.raw); // standard DX message for streaming this sensor over BLE to neoPLC apps
+
   led_state = !led_state;              
   digitalWrite(LED_BUILTIN,led_state);
   regulateLoop(1.0);
@@ -52,4 +60,3 @@ void regulateLoop(float dt)
   while((micros()-prev_time)<dT) {}
   prev_time = micros();
 }
-

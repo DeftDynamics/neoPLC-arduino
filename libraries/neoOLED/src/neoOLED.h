@@ -282,6 +282,21 @@ class neoOLED : public Print {
    */
   size_t write(const char* s);
   
+  uint8_t image[6][64];
+  
+  union {
+	char raw[20];
+	struct {
+	  uint8_t header;      // alignment header
+	  uint8_t ID;          // message ID
+	  uint8_t row;
+	  uint8_t col;
+	  uint8_t data[16];
+	} pcs;
+  } DX;
+  
+  bool updateDX(uint8_t index);
+  
 protected:
   void writeDisplay(uint8_t b, uint8_t mode) {  
     Wire.beginTransmission(m_i2cAddr);

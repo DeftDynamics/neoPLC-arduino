@@ -1,6 +1,7 @@
 // neoPLC-PWM Demo
 
-#include "neoPWM.h"
+#include <neoPWM.h>
+#include <neoBLE.h>
 
 neoPWM pwm = neoPWM();
 
@@ -10,6 +11,8 @@ bool led_state = true;
 
 void setup()
 {
+  BLE.begin();
+  
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
   
@@ -33,10 +36,12 @@ void loop() {
   for (int i = 0; i<8; i++){
     pwm.analogWrite(i,duty*4095);
   }
+
+  BLE.post(pwm.DX.raw); // standard DX message for streaming this sensor over BLE to neoPLC apps
   
   led_state = !led_state;              
   digitalWrite(LED_BUILTIN,led_state);
-  regulateLoop(0.1); // loop regulation (10 Hz)  
+  regulateLoop(0.5); // loop regulation (10 Hz)  
   
 }
 
@@ -56,5 +61,4 @@ void shutdownISR(){
   // turn off all output to be safe
   pwm.zeroAll();
 }
-
 

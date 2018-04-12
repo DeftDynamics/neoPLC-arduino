@@ -45,6 +45,13 @@ void neoBAT::begin(){
   Wire.begin();
 }
 
+void neoBAT::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 5;
+	DX.pcs.voltage = vcell;
+	DX.pcs.charge = soc;
+}
+
 float neoBAT::poll(){ 
   // read only voltage and SoC
   Wire.beginTransmission(_addr);
@@ -59,7 +66,7 @@ float neoBAT::poll(){
   vcell = ((float)VCELL/two12)*5.0;
     SOC = (buff[2]<<8) | buff[3];
     soc = ((float)SOC/two8)*1.0;
-    
+    updateDX();
     return soc;
 }
 
@@ -92,6 +99,7 @@ void neoBAT::pollAll(){
   alertStatus = buff[11]>>5 & 0b1;
    ATHD = buff[11] & 0b11111;
    athd = 32-ATHD;
+    updateDX();
 }
 
 void neoBAT::reset(){

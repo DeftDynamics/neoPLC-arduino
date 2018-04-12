@@ -41,6 +41,7 @@ class neoBLE : public Stream{
 		int peek();
 		int read();
 		void flush();
+		void post(char* DX);
 		size_t write(uint8_t byte);
 		using Print::write;
 

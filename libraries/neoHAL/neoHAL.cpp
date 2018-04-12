@@ -47,6 +47,14 @@ void neoHAL::begin(uint8_t FTH, uint8_t SF){
   writeByte(0x07,package);
 }
 
+void neoHAL::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 10;
+	DX.pcs.status = stat;
+	DX.pcs.angle = angle;
+	DX.pcs.origin = origin;
+}
+
 uint16_t neoHAL::readAngle(){
   Wire.beginTransmission(_address);
   Wire.write(0x0C);
@@ -58,6 +66,7 @@ uint16_t neoHAL::readAngle(){
   angle = (((A<<8) | B) - origin + 4095) % 4095;
   degrees = (float)angle/4095.0*360.0;
   rad = (float)angle/4095.0*2*PI;
+  updateDX();
   return angle;
 }
 
@@ -71,14 +80,16 @@ uint8_t neoHAL::status(){
   bool ML = (A&0b010000)>>4;
   bool MH = (A&0b001000)>>3;
   if (!MD) { 
-    return MAGNET_MISSING;
+    stat = MAGNET_MISSING;
   } else if (ML) {
-    return MAGNET_WEAK;
+	stat = MAGNET_WEAK;
   } else if (MH) {
-    return MAGNET_STRONG;
+	stat = MAGNET_STRONG;
   } else {
-    return MAGNET_OK;
+	stat = MAGNET_OK;
   }
+  updateDX();
+  return stat;
 }
 
 void neoHAL::setOrigin(){

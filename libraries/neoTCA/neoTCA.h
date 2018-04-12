@@ -53,6 +53,27 @@ public:
   bool SCV = 0;
   bool SCG = 0;
   bool  OC = 0;
+  
+  union {
+    char raw[20];
+    struct {
+	   uint8_t header;      // alignment header
+	   uint8_t ID;          // message ID
+	   uint8_t reserve1;
+	   uint8_t reserve2;
+	   float temperature;
+	   float refTemp;
+	   bool fault;
+	   bool vccShort;
+	   bool gndShort;
+	   bool openCircuit;
+	   uint16_t reserve3;
+	   uint16_t reserve4;
+    } pcs;
+  } DX;
+
+  void updateDX();
+
 private:
   uint8_t funID = 0;
   void readBufferBytes(uint8_t* dest, uint8_t len);

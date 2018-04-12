@@ -47,6 +47,17 @@ void neoTCA::begin(){
   read();
 }
 
+void neoTCA::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 9;
+	DX.pcs.temperature = temp;
+	DX.pcs.refTemp = refTemp;
+	DX.pcs.fault = fault;
+	DX.pcs.vccShort = SCV;
+	DX.pcs.gndShort = SCG;
+	DX.pcs.openCircuit = OC;
+}
+
 float neoTCA::read()
 {
   
@@ -81,6 +92,7 @@ float neoTCA::read()
   SCG = (Data[3]>>1) & 0b01;
    OC = (Data[3]>>0) & 0b01;
 
+  updateDX();
   return temp;
 }
 

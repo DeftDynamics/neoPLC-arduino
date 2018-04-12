@@ -63,6 +63,23 @@ public:
   uint8_t ATHD;
   uint8_t athd;
   
+	union {
+	  char raw[20];
+	  struct {
+		 uint8_t header;      // alignment header
+		 uint8_t ID;          // message ID
+		   float voltage;
+		   float charge;
+		uint16_t reserve1;
+		uint16_t reserve2;
+		uint16_t reserve3;
+		uint16_t reserve4;
+		uint16_t reserve5;
+	  } pcs;
+	} DX;
+	
+	void updateDX();
+  
 private:
   int _addr = 0x36;
   float two8 = pow(2,8);

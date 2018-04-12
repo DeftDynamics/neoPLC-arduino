@@ -170,6 +170,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         int16_t  dig_H5;
         int8_t   dig_H6;
     } bme280_calib_data;
+	
+	
     
 class neoENV {
     public:
@@ -212,14 +214,35 @@ class neoENV {
         neoENV(uint8_t addr=0x77);
         
         bool begin();
+		
+		float temperature;
+		float pressure;
+		float humidity; 
+		float altitude;
+		
+		// ENV Sensor data structure
+		union {
+		  char raw[20];
+		  struct {
+			 uint8_t header;      // alignment header
+			 uint8_t ID;          // message ID
+			uint16_t reserved;    // reserved
+			   float pressure;    // Pressure (Pa)
+			   float temperature; // Temperature
+			   float humidity;    // Humidity (RH %)
+			   float altitude;    // Est. Altitude (m)
+		  } pcs;
+		} DX;
+		
+		void updateDX();
 
-	void setSampling(sensor_mode mode              = MODE_NORMAL,
-			 sensor_sampling tempSampling  = SAMPLING_X16,
-			 sensor_sampling pressSampling = SAMPLING_X16,
-			 sensor_sampling humSampling   = SAMPLING_X16,
-			 sensor_filter filter          = FILTER_OFF,
-			 standby_duration duration     = STANDBY_MS_0_5
-			 );
+		void setSampling(sensor_mode mode      = MODE_NORMAL,
+				 sensor_sampling tempSampling  = SAMPLING_X16,
+				 sensor_sampling pressSampling = SAMPLING_X16,
+				 sensor_sampling humSampling   = SAMPLING_X16,
+				 sensor_filter filter          = FILTER_OFF,
+				 standby_duration duration     = STANDBY_MS_0_5
+				 );
       
         void takeForcedMeasurement();
         float readTemperature(void);
@@ -329,6 +352,9 @@ class neoENV {
             }
         };
         ctrl_hum _humReg;
+		
+		
+		
 };
 
 #endif

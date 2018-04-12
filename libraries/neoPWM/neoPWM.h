@@ -84,7 +84,17 @@ class neoPWM {
   void analogWrite(uint8_t num, uint16_t val, bool invert=false);
   void zeroAll();
   void softPWM(uint16_t PWM_vals[8]);
-
+	union {
+	  char raw[20];
+	  struct {
+		 uint8_t header;      // alignment header
+		 uint8_t ID;          // message ID
+		 uint8_t reserve1;
+		 uint8_t reserve2;
+		 uint16_t val[8];
+	  } pcs;
+	} DX;
+	void updateDX();
  private:
   uint8_t _i2caddr = 0x43;
 

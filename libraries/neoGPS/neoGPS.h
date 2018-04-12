@@ -293,6 +293,42 @@ class neoGPS
    bool isUpdated = false;
      
    } sat;
+
+	union {
+	  char raw[];
+	  struct {
+		 U1 header;  // alignment header
+		 U1 ID;      // message ID
+		 U1 flags;   // 3 bits fix type (0=NF, 1=DR only, 2=2D, 3=3D, 4=GNSS+DR, 5=Time only |  5 bits num SVs
+		 U1 hAcc;    // horizontal accuracy (0.1m)
+		 U4 iTOW;    // ms
+		 I4 lon;     // longitude (1e-7 deg)
+		 I4 lat;     // latitude (1e-7 deg)
+		 I4 height;  // height above ellipsoid (mm)
+	  } pcs;
+	} DXa;
+
+	union {
+	  char raw[];
+	  struct {
+		 U1 header;  // alignment header
+		 U1 ID;      // message ID
+		 U2 year;    // year 
+		 U1 month;   // month
+		 U1 day;     // day
+		 U1 hour;    // hour
+		 U1 min;     // min
+		 U2 sec;     // sec (ms)
+		 I2 velN;    // North velocity (0.01 m/s)
+		 I2 velE;    // North velocity (0.01 m/s)
+		 I2 velD;    // North velocity (0.01 m/s)
+		 I2 heading; // heading (0.001 deg)
+		 U1 sAcc;    // speed accuracy (0.1 m)
+		 U1 vAcc;    // vertical accuracy (0.1 m)
+	  } pcs;
+	} DXb;
+   
+   void updateDX();
    
 // --------------------  NAV-ODO --------------------
 

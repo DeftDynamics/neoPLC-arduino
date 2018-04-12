@@ -50,13 +50,28 @@ class neoADC
 {  
 
 public:
-  neoADC(uint8_t addr=0x48);
-  void begin();
-  float read(unsigned char channel, bool mode=1);
+	neoADC(uint8_t addr=0x48);
+	void begin();
+	float read(unsigned char channel, bool mode=1);
+	float vref = 3.3;
+  
+	union {
+	  char raw[20];
+	  struct {
+		 uint8_t header;      // alignment header
+		 uint8_t ID;          // message ID
+		 uint8_t active;
+		 uint8_t mode;
+		 int16_t V[8];
+	  } pcs;
+	} DX;
+	
+	void updateDX();
+
 private:
-  int address = 0x48;
-  bool internalRef = false;
-  unsigned char channels[8] = {0x00, 0x40, 0x10, 0x50, 0x20, 0x60, 0x30, 0x70}; 
+	int address = 0x48;
+	bool internalRef = false;
+	unsigned char channels[8] = {0x00, 0x40, 0x10, 0x50, 0x20, 0x60, 0x30, 0x70}; 
 };
 
 

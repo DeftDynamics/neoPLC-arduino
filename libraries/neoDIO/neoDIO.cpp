@@ -61,8 +61,17 @@ void neoDIO::begin() {
 	writeRegister(MCP23017_IODIRB,0xff);
 }
 
+void neoDIO::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 7;
+	DX.pcs.mode = mode;
+	DX.pcs.state = state;
+}
+
 void neoDIO::pinMode(uint8_t p, uint8_t d) {
+	bitWrite(mode,p,d==INPUT);
 	updateRegisterBit(p,(d==INPUT),MCP23017_IODIRB);
+	updateDX();
 }
 
 void neoDIO::digitalWrite(uint8_t pin, uint8_t d) {
@@ -70,6 +79,8 @@ void neoDIO::digitalWrite(uint8_t pin, uint8_t d) {
 	gpio = readRegister(MCP23017_OLATB);  // read the current GPIO output latches
 	bitWrite(gpio,pin,d);                 // set the pin and direction
 	writeRegister(MCP23017_GPIOB,gpio);   // write the new GPIO
+	bitWrite(state,pin,d);
+	updateDX();
 }
 
 void neoDIO::pullUp(uint8_t p, uint8_t d) {
@@ -77,7 +88,10 @@ void neoDIO::pullUp(uint8_t p, uint8_t d) {
 }
 
 uint8_t neoDIO::digitalRead(uint8_t pin) {
-	return (readRegister(MCP23017_GPIOB) >> pin) & 0x1;
+	uint8_t val = (readRegister(MCP23017_GPIOB) >> pin) & 0x1;
+	bitWrite(state,pin,val);
+	updateDX();
+	return val;
 }
 
 // -----------------------------------------------------------------

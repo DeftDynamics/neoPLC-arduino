@@ -1,12 +1,13 @@
 // neoPLC-DIO Demo
 
-#include "neoDIO.h"
+#include <neoDIO.h>
+#include <neoBLE.h>
 
 neoDIO dio = neoDIO();
 
 bool led_state = LOW;
 
-int mode = 1; // mode = 0 is input test  - test by connecting buttons or switches to ground
+int mode = 0; // mode = 0 is input test  - test by connecting buttons or switches to ground
               // mode = 1 is output test - test by connecting LEDs with pull-up resistor (>330 Ohm!) to V+  
   
 // -------- Setup --------
@@ -15,6 +16,8 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   delay(2000);
   Serial.println("neoDIO test");
+
+  BLE.begin();
   
   dio.begin();
 
@@ -52,6 +55,8 @@ void loop() {
       dio.digitalWrite(x,!led_state); // low = LED on since the LEDS are wired to power
     }
   }
+
+  BLE.post(dio.DX.raw); // standard DX message for streaming this sensor over BLE to neoPLC apps
   
   digitalWrite(LED_BUILTIN,led_state);
   led_state = !led_state;              

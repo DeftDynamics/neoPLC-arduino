@@ -1,6 +1,7 @@
 // neoPLC-ADC Demo
 
-#include "neoADC.h"
+#include <neoADC.h>
+#include <neoBLE.h>
 
 neoADC adc = neoADC();
 
@@ -10,6 +11,8 @@ bool led_state = true;
 
 void setup()
 {
+  BLE.begin();
+  
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
   delay(2000);
@@ -32,6 +35,8 @@ void loop()
     Serial.print(voltage,4); Serial.println(" V");
   }
   Serial.println();
+
+  BLE.post(adc.DX.raw); // standard DX message for streaming this sensor over BLE to neoPLC apps
   
   led_state = !led_state;              
   digitalWrite(LED_BUILTIN,led_state);
@@ -49,6 +54,5 @@ void regulateLoop(float dt)
   while((micros()-prev_time)<dT) {}
   prev_time = micros();
 }
-
 
 

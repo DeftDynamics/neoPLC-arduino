@@ -125,6 +125,15 @@ bool neoENV::begin()
     }
 }
 
+void neoENV::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 4;
+	DX.pcs.reserved = 0;
+	DX.pcs.pressure = pressure;
+	DX.pcs.temperature = temperature;
+	DX.pcs.humidity = humidity;
+	DX.pcs.altitude = altitude;
+}
 
 void neoENV::setSampling(sensor_mode       mode,
                             		  sensor_sampling   tempSampling,
@@ -275,7 +284,10 @@ float neoENV::readTemperature(void)
     t_fine = var1 + var2;
 
     float T = (t_fine * 5 + 128) >> 8;
-    return T/100;
+	
+	temperature = T/100;
+	updateDX();
+    return temperature;
 }
 
 float neoENV::readPressure(void) {
@@ -305,7 +317,10 @@ float neoENV::readPressure(void) {
     var2 = (((int64_t)_bme280_calib.dig_P8) * p) >> 19;
 
     p = ((p + var1 + var2) >> 8) + (((int64_t)_bme280_calib.dig_P7)<<4);
-    return (float)p/256.0;
+	
+	pressure = (float)p/256.0;
+	updateDX();
+    return pressure;
 }
 
 float neoENV::readHumidity(void) {
@@ -331,13 +346,18 @@ float neoENV::readHumidity(void) {
     v_x1_u32r = (v_x1_u32r < 0) ? 0 : v_x1_u32r;
     v_x1_u32r = (v_x1_u32r > 419430400) ? 419430400 : v_x1_u32r;
     float h = (v_x1_u32r>>12);
-    return  h / 1024.0;
+	
+	humidity = h / 1024.0;
+	updateDX();
+    return humidity;
 }
 
 float neoENV::readAltitude()
 {
     float seaLevel = SEALEVELPRESSURE_HPA;
     float atmospheric = readPressure()/100.0;
-    return 44330.0 * (1.0 - pow(atmospheric / seaLevel, 0.1903)); // see page 16
+	altitude = 44330.0 * (1.0 - pow(atmospheric / seaLevel, 0.1903)); // see page 16
+	updateDX();
+    return altitude;
 }
 

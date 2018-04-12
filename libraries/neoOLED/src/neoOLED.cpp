@@ -59,6 +59,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 neoOLED::neoOLED(uint8_t i2cAddr) {
   m_i2cAddr = i2cAddr;
 }
+
+bool neoOLED::updateDX(uint8_t index){
+	
+	// index 0 through 23 ->  rows 0-5 and cols 0-3
+	
+	uint8_t row = index / 4;
+	uint8_t col = (index % 4);
+	//Serial.printf("index = %d, row = %d, col = %d\n",index,row,col);
+	
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 11;
+	DX.pcs.row = min(row,5);
+	DX.pcs.col = min(col,3);
+	uint8_t byteCol=col*16;
+	bool flag = 0;
+	for(int i=0; i<16; i++){
+		uint8_t testVal = image[row][byteCol];
+		if (DX.pcs.data[i] != testVal){
+			DX.pcs.data[i] = testVal;
+			flag = 1;
+		}
+		byteCol++;
+	}
+	return flag;
+}
+
 //------------------------------------------------------------------------------
 uint8_t neoOLED::charWidth(uint8_t c) {
   if (!m_font) {
@@ -142,7 +168,7 @@ void neoOLED::setCol(uint8_t col) {
   m_col = col;
   col += m_colOffset;
   ssd1306WriteCmd(SSD1306_SETLOWCOLUMN | (col & 0XF));
-  ssd1306WriteCmd(SSD1306_SETHIGHCOLUMN | (col >> 4));    
+  ssd1306WriteCmd(SSD1306_SETHIGHCOLUMN | (col >> 4));  
 }  
 //------------------------------------------------------------------------------
 void neoOLED::setContrast(uint8_t value) {
@@ -173,12 +199,14 @@ void neoOLED::ssd1306WriteRam(uint8_t c) {
   if (m_col >= m_displayWidth) return;
   writeDisplay(c, SSD1306_MODE_RAM);
   m_col++;
+  image[m_row][m_col] = c;
 }
 //-----------------------------------------------------------------------------
 void neoOLED::ssd1306WriteRamBuf(uint8_t c) {
   if (m_col >= m_displayWidth) return;
   writeDisplay(c, SSD1306_MODE_RAM_BUF);
   m_col++;
+  image[m_row][m_col] = c;
 }
 //------------------------------------------------------------------------------
 GLCDFONTDECL(scaledNibble) = {

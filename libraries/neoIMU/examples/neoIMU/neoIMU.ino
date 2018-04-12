@@ -1,8 +1,10 @@
 // neoPLC-IMU Demo
 
 #include <neoIMU.h>       // Bosch BMX055 setup and parse
+#include <neoBLE.h>
 
 neoIMU imu = neoIMU();
+
 
 float ax, ay, az, gx, gy, gz, mx, my, mz;       // variables to hold latest sensor data values 
 
@@ -14,6 +16,7 @@ bool led_state = HIGH;
 
 void setup() 
 {
+  BLE.begin();
 
   pinMode(LED_BUILTIN,OUTPUT);
   digitalWrite(LED_BUILTIN,led_state);
@@ -33,7 +36,7 @@ void setup()
   */
 
   Serial.print("Initialize IMU, set scale and speed... ");
-  bool success = imu.begin(4,64,250,23,30); // Acc. Range & BW, Gyro Range & BW, Mag. output rate
+  bool success = imu.begin(4,16,250,12,20); // Acc. Range & BW, Gyro Range & BW, Mag. output rate
 
   if (success)
   {Serial.println("IMU is online");}
@@ -64,10 +67,12 @@ void loop()
   Serial.print("\tmy = ");   Serial.print(imu.my,4); 
   Serial.print("\tmz = ");   Serial.print(imu.mz,4); Serial.println(" mG\n");
     
+  BLE.post(imu.DX.raw); // standard DX message for streaming this sensor over BLE to neoPLC apps
+
   led_state = !led_state;              
   digitalWrite(LED_BUILTIN,led_state);
   
-  regulateLoop(0.02); // loop regulation (50 Hz)  
+  regulateLoop(0.1); // loop regulation (50 Hz)  
 }
 
 void regulateLoop(float dt)

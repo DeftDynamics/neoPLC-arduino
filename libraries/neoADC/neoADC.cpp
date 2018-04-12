@@ -45,6 +45,12 @@ void neoADC::begin(){
   Wire.begin();
 }
 
+void neoADC::updateDX(){
+	DX.pcs.header = 0xD0;
+	DX.pcs.ID = 6;
+	// other components are updated in 'read'
+}
+
 float neoADC::read(unsigned char channel, bool singleEnded)
 {
   char command = 0;
@@ -69,5 +75,16 @@ float neoADC::read(unsigned char channel, bool singleEnded)
     reading = Wire.read();
     reading = (reading << 8) | Wire.read();
   }
-  return reading*(3.3/4096.0);
+  
+  float voltage = reading*(vref/4096.0);
+  DX.pcs.V[channel] = reading;
+  DX.pcs.active = DX.pcs.active | (0b1 << channel);
+  if (singleEnded) {
+	DX.pcs.mode = (DX.pcs.mode) | (0b1 << channel);
+  } else {
+	DX.pcs.mode = (DX.pcs.mode) & ~(0b1 << channel);
+  }
+  updateDX();
+  
+  return voltage;
 }
