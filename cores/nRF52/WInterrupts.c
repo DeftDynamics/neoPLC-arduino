@@ -30,8 +30,8 @@
 #define NUMBER_OF_GPIO_TE 4
 #endif
 
-static voidFuncPtr callbacksInt[NUMBER_OF_GPIO_TE];
-static int8_t channelMap[NUMBER_OF_GPIO_TE];
+static voidFuncPtr callbacksInt[NUMBER_OF_GPIO_TE] = { NULL };
+static int8_t channelMap[NUMBER_OF_GPIO_TE] = { -1 };
 static int enabled = 0;
 
 /* Configure I/O interrupt sources */
@@ -42,7 +42,7 @@ static void __initialize()
 
   NVIC_DisableIRQ(GPIOTE_IRQn);
   NVIC_ClearPendingIRQ(GPIOTE_IRQn);
-  NVIC_SetPriority(GPIOTE_IRQn, 2);
+  NVIC_SetPriority(GPIOTE_IRQn, 3); //Same priority as UART (should prevent softlocks)
   NVIC_EnableIRQ(GPIOTE_IRQn);
 }
 
@@ -50,39 +50,49 @@ static void __initialize()
  * \brief Specifies a named Interrupt Service Routine (ISR) to call when an interrupt occurs.
  *        Replaces any previous function that was attached to the interrupt.
  */
-void attachInterrupt(uint32_t pin, voidFuncPtr callback, uint32_t mode)
+int attachInterrupt(uint32_t pin, voidFuncPtr callback, uint32_t mode)
 {
-  if (!enabled) {
-    __initialize();
-    enabled = 1;
+  uint32_t polarity;
+  uint8_t ch;
+  
+  if (!enabled){
+	  __initialize();
+	  enabled = 1;
   }
 
   if (pin >= PINS_COUNT) {
-    return;
+    return -1;
   }
 
   pin = g_ADigitalPinMap[pin];
 
-  uint32_t polarity;
 
   switch (mode) {
     case CHANGE:
       polarity = GPIOTE_CONFIG_POLARITY_Toggle;
       break;
 
+	case LOW:  
+	  polarity = GPIOTE_CONFIG_POLARITY_HiToLo;
+      break;
+	  
     case FALLING:
       polarity = GPIOTE_CONFIG_POLARITY_HiToLo;
       break;
 
+	case HIGH:
+	  polarity = GPIOTE_CONFIG_POLARITY_LoToHi;
+      break;
+	  
     case RISING:
       polarity = GPIOTE_CONFIG_POLARITY_LoToHi;
       break;
 
     default:
-      return;
+      return -1;
   }
 
-  for (int ch = 0; ch < NUMBER_OF_GPIO_TE; ch++) {
+  for (ch = 0; ch < NUMBER_OF_GPIO_TE; ch++) {
     if (channelMap[ch] == -1 || (uint32_t)channelMap[ch] == pin) {
       channelMap[ch] = pin;
       callbacksInt[ch] = callback;
@@ -98,6 +108,9 @@ void attachInterrupt(uint32_t pin, voidFuncPtr callback, uint32_t mode)
       break;
     }
   }
+  
+  // return the interrupt mask
+  return (1 << ch);
 }
 
 /*
@@ -124,7 +137,38 @@ void detachInterrupt(uint32_t pin)
     }
   }
 }
+/*
+void GPIOTE_IRQHandler()
+{
+  uint32_t event;
+  uint8_t ch;
 
+  for (ch = 0; ch < NUMBER_OF_GPIO_TE; ch++)
+  {
+    event = offsetof(NRF_GPIOTE_Type, EVENTS_IN[ch]);
+    if ((*(uint32_t *)((uint32_t)NRF_GPIOTE + event) == 0x1UL) && (NRF_GPIOTE->INTENSET & (1 << ch)))
+    {
+      break;
+    }
+  }
+
+  // clear event
+  *(uint32_t *)((uint32_t)NRF_GPIOTE + event) = 0;
+  #if __CORTEX_M == 0x04
+  volatile uint32_t dummy = *((volatile uint32_t *)((uint32_t)NRF_GPIOTE + event));
+  (void)dummy;
+  #endif
+  
+  // disable the interrupt
+  NRF_GPIOTE->INTENCLR = (1 << ch);
+
+  // initiate the callback
+  callbacksInt[ch]();
+
+  // enable the interrupt
+  NRF_GPIOTE->INTENSET = (1 << ch);
+}
+*/
 void GPIOTE_IRQHandler()
 {
   uint32_t event = offsetof(NRF_GPIOTE_Type, EVENTS_IN[0]);

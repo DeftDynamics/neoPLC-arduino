@@ -138,12 +138,13 @@ constexpr auto max(A&& a, B&& b) -> decltype(a < b ? std::forward<A>(a) : std::f
 
 #define bit(b) (1UL << (b))
 
-#define digitalPinToPort(P)        ( &(NRF_GPIO[P]) )
+//#define digitalPinToPort(P)        ( &(NRF_GPIO[P]) ) //removed for software serial
+#define digitalPinToPort(P)        ( NRF_GPIO ) // NRF_P0 = P0.00 - P0.31, NRF_P1 = P1.00 - P1.15 (e.g. nRF52840)
 #define digitalPinToBitMask(P)     ( 1 << g_ADigitalPinMap[P] )
 //#define analogInPinToBit(P)        ( )
-#define portOutputRegister(port)   ( &(port->OUTSET) )
+#define portOutputRegister(port)   ( &(port->OUT) )
 #define portInputRegister(port)    ( &(port->IN) )
-#define portModeRegister(port)     ( &(port->DIRSET) )
+#define portModeRegister(port)     ( &(port->DIR) )
 #define digitalPinHasPWM(P)        ( true )
 
 /*

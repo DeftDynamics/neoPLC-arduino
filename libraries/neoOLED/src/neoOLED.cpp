@@ -1,36 +1,36 @@
 /***************************************************************************
-neoPLC-OLED 
-
-A library for SSD1306 by Soloman Systech
-
-Copyright (c) 2017, Deft Dynamics
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-3. All advertising materials mentioning features or use of this software
-   must display the following acknowledgement:
-   This product includes software developed by Deft Dynamics.
-4. Neither the name of Deft Dynamics nor the
-   names of its contributors may be used to endorse or promote products
-   derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY DEFT DYNAMICS ''AS IS'' AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL DEFT DYNAMICS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-***************************************************************************/
+ neoPLC-OLED
+ 
+ A library for SSD1306 by Soloman Systech
+ 
+ Copyright (c) 2017, Deft Dynamics
+ All rights reserved.
+ 
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ 3. All advertising materials mentioning features or use of this software
+ must display the following acknowledgement:
+ This product includes software developed by Deft Dynamics.
+ 4. Neither the name of Deft Dynamics nor the
+ names of its contributors may be used to endorse or promote products
+ derived from this software without specific prior written permission.
+ 
+ THIS SOFTWARE IS PROVIDED BY DEFT DYNAMICS ''AS IS'' AND ANY
+ EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL DEFT DYNAMICS BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ***************************************************************************/
 
 // elements of this library are based on code by William Greiman,
 // released under the following license:
@@ -57,251 +57,269 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "neoOLED.h"
 //------------------------------------------------------------------------------
 neoOLED::neoOLED(uint8_t i2cAddr) {
-  m_i2cAddr = i2cAddr;
+    m_i2cAddr = i2cAddr;
 }
 
 bool neoOLED::updateDX(uint8_t index){
-	
-	// index 0 through 23 ->  rows 0-5 and cols 0-3
-	
-	uint8_t row = index / 4;
-	uint8_t col = (index % 4);
-	//Serial.printf("index = %d, row = %d, col = %d\n",index,row,col);
-	
-	DX.pcs.header = 0xD0;
-	DX.pcs.ID = 11;
-	DX.pcs.row = min(row,5);
-	DX.pcs.col = min(col,3);
-	uint8_t byteCol=col*16;
-	bool flag = 0;
-	for(int i=0; i<16; i++){
-		uint8_t testVal = image[row][byteCol];
-		if (DX.pcs.data[i] != testVal){
-			DX.pcs.data[i] = testVal;
-			flag = 1;
-		}
-		byteCol++;
-	}
-	return flag;
+    
+    // index 0 through 23 ->  rows 0-5 and cols 0-3
+    
+    uint8_t row = index / 4;
+    uint8_t col = (index % 4);
+    //Serial.printf("index = %d, row = %d, col = %d\n",index,row,col);
+    
+    DX.pcs.header = 0xD0;
+    DX.pcs.ID = 11;
+    DX.pcs.row = min(row,5);
+    DX.pcs.col = min(col,3);
+    uint8_t byteCol=col*16;
+    bool flag = 0;
+    for(int i=0; i<16; i++){
+        uint8_t testVal = image[row][byteCol];
+        if (DX.pcs.data[i] != testVal){
+            DX.pcs.data[i] = testVal;
+            flag = 1;
+        }
+        byteCol++;
+    }
+    return flag;
 }
 
 //------------------------------------------------------------------------------
 uint8_t neoOLED::charWidth(uint8_t c) {
-  if (!m_font) {
-    return 0;
-  }
-  uint8_t first = readFontByte(m_font + FONT_FIRST_CHAR);
-  uint8_t count = readFontByte(m_font + FONT_CHAR_COUNT);
-  if (c < first || c >= (first + count)) {
-    return 0;
-  }
-  if (readFontByte(m_font) || readFontByte(m_font + 1) > 1) {
-    // Proportional font.
-    return readFontByte(m_font + FONT_WIDTH_TABLE + c - first);
-  }
-  // Fixed width font.
-  return m_magFactor*readFontByte(m_font + FONT_FIXED_WIDTH);
+    if (!m_font) {
+        return 0;
+    }
+    uint8_t first = readFontByte(m_font + FONT_FIRST_CHAR);
+    uint8_t count = readFontByte(m_font + FONT_CHAR_COUNT);
+    if (c < first || c >= (first + count)) {
+        return 0;
+    }
+    if (readFontByte(m_font) || readFontByte(m_font + 1) > 1) {
+        // Proportional font.
+        return readFontByte(m_font + FONT_WIDTH_TABLE + c - first);
+    }
+    // Fixed width font.
+    return m_magFactor*readFontByte(m_font + FONT_FIXED_WIDTH);
 }
 //------------------------------------------------------------------------------
 void neoOLED::clear() {
-  clear(0, displayWidth() - 1, 0 , displayRows() - 1);
-  #if INCLUDE_SCROLLING 
-  m_scroll = m_scroll ? 1 : 0;
-  ssd1306WriteCmd(SSD1306_SETSTARTLINE | 0); 
-  #endif  //INCLUDE_SCROLLING   
+    clear(0, displayWidth() - 1, 0 , displayRows() - 1);
+#if INCLUDE_SCROLLING
+    m_scroll = m_scroll ? 1 : 0;
+    ssd1306WriteCmd(SSD1306_SETSTARTLINE | 0);
+#endif  //INCLUDE_SCROLLING
 }
 //------------------------------------------------------------------------------
 void neoOLED::clear(uint8_t c0, uint8_t c1, uint8_t r0, uint8_t r1) {
-  if (r1 >= displayRows()) r1 = displayRows() - 1;
-  for (uint8_t r = r0; r <= r1; r++) {
-    setCursor(c0, r);
-    for (uint8_t c = c0; c <= c1; c++) {
-      ssd1306WriteRamBuf(0);   
+    if (r1 >= displayRows()) r1 = displayRows() - 1;
+    for (uint8_t r = r0; r <= r1; r++) {
+        setCursor(c0, r);
+        for (uint8_t c = c0; c <= c1; c++) {
+            ssd1306WriteRamBuf(0);
+        }
     }
-  }
-  setCursor(c0, r0);
+    setCursor(c0, r0);
 }
 //------------------------------------------------------------------------------
 void neoOLED::clearToEOL() {
-  clear (m_col, displayWidth() - 1, m_row, m_row + fontRows() - 1);
+    clear (m_col, displayWidth() - 1, m_row, m_row + fontRows() - 1);
 }
 //------------------------------------------------------------------------------
 uint8_t neoOLED::fontHeight() {
-  return m_font ? m_magFactor*readFontByte(m_font + FONT_HEIGHT) : 0;
+    return m_font ? m_magFactor*readFontByte(m_font + FONT_HEIGHT) : 0;
 }
 //------------------------------------------------------------------------------
 uint8_t neoOLED::fontWidth() {
-  return m_font ? m_magFactor*readFontByte(m_font + FONT_FIXED_WIDTH) : 0;
+    return m_font ? m_magFactor*readFontByte(m_font + FONT_FIXED_WIDTH) : 0;
 }
 //------------------------------------------------------------------------------
 void neoOLED::init(const DevType* dev) {
-  m_col = 0;
-  m_row = 0;
-  #ifdef __AVR__  
-  const uint8_t* table = (const uint8_t*)pgm_read_word(&dev->initcmds);
-  #else  // __AVR__
-  const uint8_t* table = dev->initcmds;
-  #endif  // __AVR
-  uint8_t size = readFontByte(&dev->initSize);
-  m_displayWidth = readFontByte(&dev->lcdWidth);
-  m_displayHeight = readFontByte(&dev->lcdHeight);
-  m_colOffset = readFontByte(&dev->colOffset); 
-  for (uint8_t i = 0; i < size; i++) {
-    ssd1306WriteCmd(readFontByte(table + i));
-  }
-  #if INCLUDE_SCROLLING 
-  m_scroll = m_displayHeight != 64 || INCLUDE_SCROLLING < 2 ? 0 : 1;
-  #endif  //INCLUDE_SCROLLING 
-  clear();
+    m_col = 0;
+    m_row = 0;
+#ifdef __AVR__
+    const uint8_t* table = (const uint8_t*)pgm_read_word(&dev->initcmds);
+#else  // __AVR__
+    const uint8_t* table = dev->initcmds;
+#endif  // __AVR
+    uint8_t size = readFontByte(&dev->initSize);
+    m_displayWidth = readFontByte(&dev->lcdWidth);
+    m_displayHeight = readFontByte(&dev->lcdHeight);
+    m_colOffset = readFontByte(&dev->colOffset);
+    for (uint8_t i = 0; i < size; i++) {
+        ssd1306WriteCmd(readFontByte(table + i));
+    }
+#if INCLUDE_SCROLLING
+    m_scroll = m_displayHeight != 64 || INCLUDE_SCROLLING < 2 ? 0 : 1;
+#endif  //INCLUDE_SCROLLING
+    clear();
 }
 //------------------------------------------------------------------------------
 void neoOLED::reset(uint8_t rst) {
-  pinMode(rst, OUTPUT);
-  digitalWrite(rst, LOW);
-  delay(10);
-  digitalWrite(rst, HIGH);
-  delay(10);  
+    pinMode(rst, OUTPUT);
+    digitalWrite(rst, LOW);
+    delay(10);
+    digitalWrite(rst, HIGH);
+    delay(10);
 }
 //------------------------------------------------------------------------------
 void neoOLED::setCol(uint8_t col) {
-  if (col >= m_displayWidth) return;
-  m_col = col;
-  col += m_colOffset;
-  ssd1306WriteCmd(SSD1306_SETLOWCOLUMN | (col & 0XF));
-  ssd1306WriteCmd(SSD1306_SETHIGHCOLUMN | (col >> 4));  
-}  
+    if (col >= m_displayWidth) return;
+    m_col = col;
+    col += m_colOffset;
+    ssd1306WriteCmd(SSD1306_SETLOWCOLUMN | (col & 0XF));
+    ssd1306WriteCmd(SSD1306_SETHIGHCOLUMN | (col >> 4));
+}
 //------------------------------------------------------------------------------
 void neoOLED::setContrast(uint8_t value) {
-  ssd1306WriteCmd(SSD1306_SETCONTRAST);
-  ssd1306WriteCmd(value);
+    ssd1306WriteCmd(SSD1306_SETCONTRAST);
+    ssd1306WriteCmd(value);
 }
 //------------------------------------------------------------------------------
 void neoOLED::setCursor(uint8_t col, uint8_t row) {
-  setCol(col);
-  setRow(row);
-}  
+    setCol(col);
+    setRow(row);
+}
 //------------------------------------------------------------------------------
 void neoOLED::setRow(uint8_t row) {
-  if (row >= m_displayHeight/8) return;
-  m_row = row;
-  ssd1306WriteCmd(SSD1306_SETSTARTPAGE | row); 
+    if (row >= m_displayHeight/8) return;
+    m_row = row;
+    ssd1306WriteCmd(SSD1306_SETSTARTPAGE | row);
 }
 //------------------------------------------------------------------------------
-#if INCLUDE_SCROLLING 
-void neoOLED::setScroll(bool enable) {
-  if (m_displayHeight != 64) return;
-  clear();
-  m_scroll = enable ? 1 : 0;
+
+void neoOLED::flipVertical(bool flip){
+    if(flip){
+        ssd1306WriteCmd(SSD1306_COMSCANINC);
+    }else{
+        ssd1306WriteCmd(SSD1306_COMSCANDEC);
+    }
 }
-#endif   // INCLUDE_SCROLLING 
+
+void neoOLED::flipHorizontal(bool flip){
+    if(flip){
+        ssd1306WriteCmd(SSD1306_SEGREMAP);
+    }else{
+        ssd1306WriteCmd(SSD1306_SEGREMAP+1);
+    }
+}
+
+//------------------------------------------------------------------------------
+#if INCLUDE_SCROLLING
+void neoOLED::setScroll(bool enable) {
+    if (m_displayHeight != 64) return;
+    clear();
+    m_scroll = enable ? 1 : 0;
+}
+#endif   // INCLUDE_SCROLLING
 //-----------------------------------------------------------------------------
 void neoOLED::ssd1306WriteRam(uint8_t c) {
-  if (m_col >= m_displayWidth) return;
-  writeDisplay(c, SSD1306_MODE_RAM);
-  m_col++;
-  image[m_row][m_col] = c;
+    if (m_col >= m_displayWidth) return;
+    writeDisplay(c, SSD1306_MODE_RAM);
+    m_col++;
+    image[m_row][m_col] = c;
 }
 //-----------------------------------------------------------------------------
 void neoOLED::ssd1306WriteRamBuf(uint8_t c) {
-  if (m_col >= m_displayWidth) return;
-  writeDisplay(c, SSD1306_MODE_RAM_BUF);
-  m_col++;
-  image[m_row][m_col] = c;
+    if (m_col >= m_displayWidth) return;
+    writeDisplay(c, SSD1306_MODE_RAM_BUF);
+    m_col++;
+    image[m_row][m_col] = c;
 }
 //------------------------------------------------------------------------------
 GLCDFONTDECL(scaledNibble) = {
-  0X00, 0X03, 0X0C, 0X0F,
-  0X30, 0X33, 0X3C, 0X3F,
-  0XC0, 0XC3, 0XCC, 0XCF,
-  0XF0, 0XF3, 0XFC, 0XFF
+    0X00, 0X03, 0X0C, 0X0F,
+    0X30, 0X33, 0X3C, 0X3F,
+    0XC0, 0XC3, 0XCC, 0XCF,
+    0XF0, 0XF3, 0XFC, 0XFF
 };
 //------------------------------------------------------------------------------
 size_t neoOLED::write(uint8_t ch) {
-  const uint8_t* base = m_font;
-  if (!base) return 0;
-  uint16_t size = readFontByte(base++) << 8;
-  size |= readFontByte(base++);
-  uint8_t w = readFontByte(base++);
-  uint8_t h = readFontByte(base++);
-  uint8_t nr = (h + 7)/8;
-  uint8_t first = readFontByte(base++);
-  uint8_t count = readFontByte(base++);
-  if (ch < first || ch >= (first + count)) {
-    if (ch == '\r') {
-      setCol(0);
-      return 1;      
-    }    
-    if (ch == '\n') {
-      #if INCLUDE_SCROLLING == 0
-      setCursor(0, m_row + m_magFactor*nr);
-      #else  // INCLUDE_SCROLLING
-      uint8_t tmp = m_row + m_magFactor*nr;
-      if (tmp >= m_displayHeight/8  && m_scroll) {
-        tmp = 0;
-        m_scroll = 2;
-      }
-      setCursor(0, tmp);
-      if (m_scroll > 1) {
-        clearToEOL();
-        tmp +=  m_magFactor*nr;
-        tmp *= 8;
-        if (tmp > m_displayHeight) {
-          tmp = 0;
+    const uint8_t* base = m_font;
+    if (!base) return 0;
+    uint16_t size = readFontByte(base++) << 8;
+    size |= readFontByte(base++);
+    uint8_t w = readFontByte(base++);
+    uint8_t h = readFontByte(base++);
+    uint8_t nr = (h + 7)/8;
+    uint8_t first = readFontByte(base++);
+    uint8_t count = readFontByte(base++);
+    if (ch < first || ch >= (first + count)) {
+        if (ch == '\r') {
+            setCol(0);
+            return 1;
         }
-        ssd1306WriteCmd(SSD1306_SETSTARTLINE | tmp);        
-      }
-      #endif  // INCLUDE_SCROLLING      
-      return 1;
-    }
-    return 0;
-  }
-  ch -= first;
-  uint8_t s = m_magFactor;
-  uint8_t thieleShift = 0;
-  if (size < 2) {
-    if (size) s = 0;
-    base += nr*w*ch;
-  } else {
-    if (h & 7) {
-      thieleShift = 8 - (h & 7);
-    }
-    uint16_t index = 0;
-    for (uint8_t i = 0; i < ch; i++) {
-      index += readFontByte(base + i);
-    }
-    w = readFontByte(base + ch);
-    base += nr*index + count;
-  }
-  uint8_t scol = m_col;
-  uint8_t srow = m_row;
-  for (uint8_t r = 0; r < nr; r++) {
-    for (uint8_t m = 0; m < m_magFactor; m++) {
-      if (r || m) setCursor(scol, m_row + 1);
-      for (uint8_t c = 0; c < w; c++) {
-        uint8_t b = readFontByte(base + c + r*w);
-        if (thieleShift && (r + 1) == nr) {
-          b >>= thieleShift;
+        if (ch == '\n') {
+#if INCLUDE_SCROLLING == 0
+            setCursor(0, m_row + m_magFactor*nr);
+#else  // INCLUDE_SCROLLING
+            uint8_t tmp = m_row + m_magFactor*nr;
+            if (tmp >= m_displayHeight/8  && m_scroll) {
+                tmp = 0;
+                m_scroll = 2;
+            }
+            setCursor(0, tmp);
+            if (m_scroll > 1) {
+                clearToEOL();
+                tmp +=  m_magFactor*nr;
+                tmp *= 8;
+                if (tmp > m_displayHeight) {
+                    tmp = 0;
+                }
+                ssd1306WriteCmd(SSD1306_SETSTARTLINE | tmp);
+            }
+#endif  // INCLUDE_SCROLLING
+            return 1;
         }
-        if (m_magFactor == 2) {
-           b = m ?  b >> 4 : b & 0XF;
-           b = readFontByte(scaledNibble + b);
-           ssd1306WriteRamBuf(b);
-        }
-        ssd1306WriteRamBuf(b);
-      }
-      for (uint8_t i = 0; i < s; i++) {
-        ssd1306WriteRamBuf(0);
-      }
+        return 0;
     }
-  }
-  setRow(srow);
-  return 1;
+    ch -= first;
+    uint8_t s = m_magFactor;
+    uint8_t thieleShift = 0;
+    if (size < 2) {
+        if (size) s = 0;
+        base += nr*w*ch;
+    } else {
+        if (h & 7) {
+            thieleShift = 8 - (h & 7);
+        }
+        uint16_t index = 0;
+        for (uint8_t i = 0; i < ch; i++) {
+            index += readFontByte(base + i);
+        }
+        w = readFontByte(base + ch);
+        base += nr*index + count;
+    }
+    uint8_t scol = m_col;
+    uint8_t srow = m_row;
+    for (uint8_t r = 0; r < nr; r++) {
+        for (uint8_t m = 0; m < m_magFactor; m++) {
+            if (r || m) setCursor(scol, m_row + 1);
+            for (uint8_t c = 0; c < w; c++) {
+                uint8_t b = readFontByte(base + c + r*w);
+                if (thieleShift && (r + 1) == nr) {
+                    b >>= thieleShift;
+                }
+                if (m_magFactor == 2) {
+                    b = m ?  b >> 4 : b & 0XF;
+                    b = readFontByte(scaledNibble + b);
+                    ssd1306WriteRamBuf(b);
+                }
+                ssd1306WriteRamBuf(b);
+            }
+            for (uint8_t i = 0; i < s; i++) {
+                ssd1306WriteRamBuf(0);
+            }
+        }
+    }
+    setRow(srow);
+    return 1;
 }
 //------------------------------------------------------------------------------
 size_t neoOLED::write(const char* s) {
-  size_t n = strlen(s);
-  for (size_t i = 0; i < n; i++) {
-    write(s[i]);
-  }
-  return n;
+    size_t n = strlen(s);
+    for (size_t i = 0; i < n; i++) {
+        write(s[i]);
+    }
+    return n;
 }

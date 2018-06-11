@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <string.h>
 #include <ble.h>
+#include <ble_gap.h>
 #include <ble_hci.h>
 #include <nrf_sdm.h>
 
@@ -41,7 +42,6 @@ class neoBLE : public Stream{
 		int peek();
 		int read();
 		void flush();
-		void post(char* DX);
 		size_t write(uint8_t byte);
 		using Print::write;
 
@@ -50,6 +50,7 @@ class neoBLE : public Stream{
 		
 	private:
 		uint16_t _conn_handle=BLE_CONN_HANDLE_INVALID;
+		ble_gap_addr_t _peer_addr; 
 		uint16_t _service_handle;
 		uint16_t _rx_handle=5;
 		uint16_t _tx_handle=5;

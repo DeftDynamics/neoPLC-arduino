@@ -195,6 +195,7 @@ void loop() {
     oled_state++;
     oled_state = oled_state % 16;
     
+    //oled.clearToEOL();
     //oled.print("  ");
     //oled.println((float)millis()/1000.0);
     for (int i=0; i<24; i++){

@@ -90,7 +90,8 @@ void delay( uint32_t ms )
         {
           // if zero, immediately return
           return ;
-        } else if (us < 100) {
+        } else if (us < 150) {
+			//9600 Baud is 104us delay, need to use high res timing, so this value must be above 104.
           // if small, use the high resolution but innaccurate built-in delay using NOPs
             nrf_delay_us(us);
         } else {

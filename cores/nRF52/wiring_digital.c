@@ -83,18 +83,18 @@ void digitalWrite( uint32_t ulPin, uint32_t ulVal )
   if (ulPin >= PINS_COUNT) {
     return;
   }
-
+  analogWrite(ulPin, 0);	
   ulPin = g_ADigitalPinMap[ulPin];
 
   switch ( ulVal )
   {
     case LOW:
       NRF_GPIO->OUTCLR = (1UL << ulPin);
-    break ;
+      break ;
 
     default:
       NRF_GPIO->OUTSET = (1UL << ulPin);
-    break ;
+      break ;
   }
 
   return ;

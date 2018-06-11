@@ -33,6 +33,8 @@ static uint8_t                      * mp_ble_evt_buffer = (uint8_t *)BLE_EVT_BUF
 static uint16_t                     m_ble_evt_buffer_size = sizeof(BLE_EVT_BUFFER);            /**< Size of BLE event buffer. */
 //static ble_evt_handler_t            m_ble_evt_handler;
 
+static dfu_ble_peer_data_t m_peer_data;
+
 
 #ifdef __cplusplus
 extern "C"{
@@ -138,15 +140,6 @@ size_t neoBLE::write(uint8_t byte) {
   return 1;
 }
 
-void neoBLE::post(char* DX){
-  //BLE.flush();
-  _txCount = 0; // force the outgoing buffer back to the first index since we Will write 20 bytes
-  for (int i=0; i<20; i++) {
-    BLE.write(DX[i]);
-  }
-  //BLE.flush();
-}
-
 void neoBLE::_received(const uint8_t* data, uint16_t size) {
   //Serial.println("_recieved");
   for (int i = 0; i < size; i++) {
@@ -160,6 +153,7 @@ void neoBLE::eventHandler(ble_evt_t * p_ble_evt){
 	switch (p_ble_evt->header.evt_id){
 		case BLE_GAP_EVT_CONNECTED:
 			_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+			_peer_addr = p_ble_evt->evt.gap_evt.params.connected.peer_addr;
 		break;
 		case BLE_GAP_EVT_DISCONNECTED:
 			_conn_handle = BLE_CONN_HANDLE_INVALID;
@@ -193,8 +187,14 @@ void neoBLE::eventHandler(ble_evt_t * p_ble_evt){
 				sd_ble_gatts_rw_authorize_reply(_conn_handle, &auth_reply);
 				switch (p_ble_write_evt->data[0]){
 					case OP_CODE_START_DFU:
+						m_peer_data.addr=_peer_addr;
 						sd_softdevice_disable();
 						sd_softdevice_vector_table_base_set(NRF_UICR->NRFFW[0]);
+						//set peer data here
+						
+						//dfu_ble_svc_peer_data_set(&m_peer_data);
+						//NVIC_ClearPendingIRQ(SWI2_IRQn);
+						//NVIC_DisableIRQ(UART0_IRQn);
 						dfu_ble_svc_boot_ble();
 					break;
 				}

@@ -91,13 +91,22 @@ static const uint8_t AREF = PIN_AREF;
 #define PIN_SPI_MOSI      	15
 #define PIN_SPI_SCK        	16
 #define PIN_SPI_CS       	17
-
 static const uint8_t SS   = PIN_SPI_CS ;
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;
 
-
+/*
+//Second SPI Interface
+#define PIN_SPI1_MISO      	14
+#define PIN_SPI1_MOSI      	15
+#define PIN_SPI1_SCK        16
+#define PIN_SPI1_CS       	17
+static const uint8_t SS1   = PIN_SPI1_CS ;
+static const uint8_t MOSI1 = PIN_SPI1_MOSI ;
+static const uint8_t MISO1 = PIN_SPI1_MISO ;
+static const uint8_t SCK1  = PIN_SPI1_SCK ;
+*/
 #ifdef __cplusplus
 }
 #endif

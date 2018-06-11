@@ -69,10 +69,10 @@ neoPLCv1.upload.protocol=
 neoPLCv1.upload.interface=
 neoPLCv1.upload.target=nrf52
 neoPLCv1.upload.maximum_size=372000
-neoPLCv1.upload.setup_command=transport select swd;
-neoPLCv1.upload.use_1200bps_touch=false
-neoPLCv1.upload.wait_for_upload_port=false
-neoPLCv1.upload.native_usb=false
+#neoPLCv1.upload.setup_command=transport select swd;
+#neoPLCv1.upload.use_1200bps_touch=false
+#neoPLCv1.upload.wait_for_upload_port=false
+#neoPLCv1.upload.native_usb=false
 
 neoPLCv1.build.mcu=cortex-m4
 neoPLCv1.build.f_cpu=16000000
@@ -83,4 +83,5 @@ neoPLCv1.build.variant_system_lib=
 neoPLCv1.build.extra_flags=-DNRF52
 neoPLCv1.build.float_flags=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
 neoPLCv1.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
+neoPLCv1.serial.restart_cmd=false
 

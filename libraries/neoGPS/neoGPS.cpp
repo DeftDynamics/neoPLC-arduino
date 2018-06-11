@@ -501,7 +501,7 @@ void neoGPS::updateDX(){
   DXb.pcs.velN = pvt.velN*100;
   DXb.pcs.velE = pvt.velE*100;
   DXb.pcs.velD = pvt.velD*100;
-  DXb.pcs.heading = pvt.headMot*1000;
+  DXb.pcs.heading = pvt.headMot*100;
   DXb.pcs.sAcc = min(255,pvt.sAcc*10);
   DXb.pcs.vAcc = min(255,pvt.vAcc*10);
   

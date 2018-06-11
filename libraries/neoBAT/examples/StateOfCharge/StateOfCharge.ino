@@ -1,4 +1,4 @@
-// This is an example of the neoPLC-BAT battery fuel-guage 
+// This is an example of the neoPLC-BAT battery fuel gauge 
 // The fuel-guage works with most single-cell LiPo and Li-Ion batteries
 // Most of the algorithm is hidden in the Maxim IC, so the interface simply polls the IC for battery State of Charge (SoC)
 
