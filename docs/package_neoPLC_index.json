@@ -282,17 +282,17 @@
             },
             {
               "host": "i686-linux-gnu",
-              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/tools/nrfutil-mac.tar.gz",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/tools/nrfutil-linux.tar.gz",
               "archiveFileName": "nrfutil-linux.tar.gz",
-              "size": "4558668",
-              "checksum": "MD5:403b0f83b6fabb146a12526e7c7009e9"
+              "size": "4559477",
+              "checksum": "MD5:291eb07d814686780994d732fe5c9f80"
             },
             {
               "host": "x86_64-pc-linux-gnu",
-              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/tools/nrfutil-mac.tar.gz",
+              "url": "https://github.com/DeftDynamics/neoPLC-arduino/releases/download/tools/nrfutil-linux.tar.gz",
               "archiveFileName": "nrfutil-linux.tar.gz",
-              "size": "4558668",
-              "checksum": "MD5:403b0f83b6fabb146a12526e7c7009e9"
+              "size": "4559477",
+              "checksum": "MD5:291eb07d814686780994d732fe5c9f80"
             },
             {
               "host": "i686-mingw32",
