@@ -85,3 +85,31 @@ neoPLCv1.build.float_flags=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
 neoPLCv1.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
 neoPLCv1.serial.restart_cmd=false
 
+#neoPLCrelay
+#################################################################################
+neoPLCrelay.name=neoPLC BLE-UART relay
+
+neoPLCrelay.vid.0=0x10c4
+neoPLCrelay.pid.0=0xea60
+
+neoPLCrelay.upload.tool=nRFgo
+neoPLCrelay.upload.protocol=
+neoPLCrelay.upload.interface=
+neoPLCrelay.upload.target=nrf52
+neoPLCrelay.upload.maximum_size=372000
+#neoPLCrelay.upload.setup_command=transport select swd;
+#neoPLCrelay.upload.use_1200bps_touch=false
+#neoPLCrelay.upload.wait_for_upload_port=false
+#neoPLCrelay.upload.native_usb=false
+
+neoPLCrelay.build.mcu=cortex-m4
+neoPLCrelay.build.f_cpu=16000000
+neoPLCrelay.build.board=NRF52_DK
+neoPLCrelay.build.core=nRF52
+neoPLCrelay.build.variant=neoPLCrelay
+neoPLCrelay.build.variant_system_lib=
+neoPLCrelay.build.extra_flags=-DNRF52
+neoPLCrelay.build.float_flags=-mfloat-abi=softfp -mfpu=fpv4-sp-d16
+neoPLCrelay.build.ldscript=armgcc_s132_nrf52832_xxaa.ld
+neoPLCrelay.serial.restart_cmd=false
+
